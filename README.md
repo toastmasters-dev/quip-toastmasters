@@ -1,2 +1,3 @@
 npm install
-npm starti
+
+npm start
