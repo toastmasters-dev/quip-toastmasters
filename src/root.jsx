@@ -56,12 +56,12 @@ class RootRecord extends quip.apps.RootRecord {
 quip.apps.registerClass(RootRecord, "root");
 
 class Root extends React.Component {
-    // _key can be details
-    setSpeech = (_value, speechInt, _key) => {
+    setSpeech = (_value, speechInt) => {
         const record = quip.apps.getRootRecord();
         const cards = record.get("cards").getRecords();
         const _card = cards.filter((card) => card.get('number') === parseInt(speechInt))[0];
-        _card.set(_key, _value);        
+        _card.set('details', _value);        
+        
         // Force a render without state change. 
         // to show speech details
         this.forceUpdate();

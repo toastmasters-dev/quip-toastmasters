@@ -37,9 +37,7 @@ function getTime(_projectString) {
 export default class SpeechSlot extends React.Component {
   removeValue = () => {
     const speechNum = this.props.card.get('number');
-    this.props.removeValue('', speechNum, 'speechTitle');
-    this.props.removeValue('', speechNum, 'details');
-    this.props.removeValue('', speechNum, 'speakerName');
+    this.props.removeValue('', speechNum);
   }
 
   render() {

@@ -1621,10 +1621,6 @@ function findMatches(wordToMatch) {
         const regex = new RegExp(wordToMatch, 'gi');
         return place.manual.match(regex) || place.project.match(regex)
     }).slice(0, 5); // only return this many results
-}
-
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 } 
 
 export default class PickList extends React.Component {
@@ -1651,7 +1647,7 @@ export default class PickList extends React.Component {
     setSpeech = (event) => {
         const _value = event.target.textContent.trim().toUpperCase();
         const speechInt = event.target.parentNode.parentNode.title;
-        this.props.setSpeech(_value, speechInt, 'details');
+        this.props.setSpeech(_value, speechInt);
         // hide suggestions
         this.setState({ suggestions: [] });
     }
