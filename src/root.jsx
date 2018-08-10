@@ -1,5 +1,6 @@
 import PickList from "./pickList";
 import Speechslot from "./speechSlot";
+import { getTime } from './utils';
 
 class SpeechSelect extends quip.apps.RichTextRecord {
     static getProperties = () => ({
@@ -67,6 +68,25 @@ class Root extends React.Component {
         this.forceUpdate();
     }
 
+    /*
+    JSON will be of form
+    {
+        version: '1.0',
+        data: {
+            date: 'Monday, August 6 2018',
+            toastmaster: 'Anny He',
+            grammarian: 'Srinath Krishna Ananthakrishnan',
+            jokemaster: 'Srinath Krishna Ananthakrishnan',
+            speeches: [
+                speaker1: 'Anny He',
+                speechTitle1: 'I want sushi',
+                time: '13 minutes', 
+                details: 'COMPETENT COMMUNICATION (CC) MANUAL 1) THE ICE BREAKER (4-6 MIN)
+            ]
+            ...
+        }
+    }
+    */
     openTab = () => {
         const record = quip.apps.getRootRecord();
         const cards = record.get("cards").getRecords();
@@ -74,14 +94,24 @@ class Root extends React.Component {
             return {
                 number: card.get('number'),
                 details: card.get('details'), 
+                time: getTime(card.get('details')),
             }; 
         });
         
-        const obj = {};
-        obj.speeches = _cards;
-        Object.keys(record.getData()).forEach((_key) => {
+        // TODO: get from version form manifest.json or another config file
+        const obj = { version: '1.0', data: {} };
+        obj.data.speeches = _cards;
+        
+        Object.keys(record.getData()).forEach((_key) => {            
             if (_key != 'cards') {
-                obj[_key] = record.get(_key).getTextContent().trim();
+                const _value = record.get(_key).getTextContent().trim();
+                if (_key.startsWith('speaker') || _key.startsWith('speechTitle')) {
+                    // get the last character
+                    const _index = parseInt(_key.slice(-1)); 
+                    obj.data.speeches[_index - 1][_key] = _value;
+                } else {
+                    obj.data[_key] = _value;
+                }
             }  
         });        
 
@@ -110,10 +140,8 @@ class Root extends React.Component {
         return (
             <div>
                 <p>Meeting date <quip.apps.ui.RichTextBox record={date} /></p>
-                {/* add speakers */}
                 <p>toastmaster <quip.apps.ui.RichTextBox record={toastmaster} /></p>
                 <p>jokemaster <quip.apps.ui.RichTextBox record={jokemaster} /></p>
-                {/* need time, speech title, which project and manual */}
                 {cards.map((card) => {
                     const _number = card.get('number');
                     return <div>
