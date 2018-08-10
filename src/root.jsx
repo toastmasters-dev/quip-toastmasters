@@ -76,23 +76,14 @@ class Root extends React.Component {
                 details: card.get('details'), 
             }; 
         });
-        const obj = {
-            date: record.get('date').getTextContent().trim(),
-            toastmaster: record.get('toastmaster').getTextContent().trim(),
-            jokemaster: record.get('jokemaster').getTextContent().trim(),
-            topicsmaster: record.get('topicsmaster').getTextContent().trim(),
-            generalEvaluator: record.get('generalEvaluator').getTextContent().trim(),
-            speaker1: record.get('speaker1').getTextContent().trim(),
-            speechTitle1: record.get('speechTitle1').getTextContent().trim(),
-            speaker2: record.get('speaker2').getTextContent().trim(),
-            speechTitle2: record.get('speechTitle2').getTextContent().trim(),
-            speechEvaluator1: record.get('speechEvaluator1').getTextContent().trim(),
-            speechEvaluator2: record.get('speechEvaluator2').getTextContent().trim(),
-            grammarian: record.get('grammarian').getTextContent().trim(),
-            timer: record.get('timer').getTextContent().trim(),
-            ahCounter: record.get('ahCounter').getTextContent().trim(),
-            speeches: _cards
-        };
+        
+        const obj = {};
+        obj.speeches = _cards;
+        Object.keys(record.getData()).forEach((_key) => {
+            if (_key != 'cards') {
+                obj[_key] = record.get(_key).getTextContent().trim();
+            }  
+        });        
 
         const _str = JSON.stringify(obj);
         quip.apps.openLink('http://output.jsbin.com/maguxep?data=' + encodeURIComponent(_str));
