@@ -5,15 +5,11 @@ class SpeechSelect extends quip.apps.RichTextRecord {
     static getProperties = () => ({
         number: "number",
         details: "string",
-        speakerName: 'string',
-        speechTitle: 'string',
     });
 
     static getDefaultProperties = () => ({
         number: 0,
         details: { RichText_placeholderText: "Which project and manual is the speech?" },
-        speakerName: { RichText_placeholderText: "Who is speaking?" },
-        speechTitle: { RichText_placeholderText: "What is the title of the speech?" },
     });
 }
 
@@ -21,11 +17,15 @@ quip.apps.registerClass(SpeechSelect, "draggable-card");
 
 class RootRecord extends quip.apps.RootRecord {
     static getProperties = () => ({
-        toastmaster: quip.apps.RichTextRecord,
         date: quip.apps.RichTextRecord,
+        toastmaster: quip.apps.RichTextRecord,
         jokemaster: quip.apps.RichTextRecord,       
         topicsmaster: quip.apps.RichTextRecord,
         generalEvaluator: quip.apps.RichTextRecord,
+        speaker1: quip.apps.RichTextRecord,
+        speechTitle1: quip.apps.RichTextRecord,
+        speaker2: quip.apps.RichTextRecord,
+        speechTitle2: quip.apps.RichTextRecord,
         speechEvaluator1: quip.apps.RichTextRecord,
         speechEvaluator2: quip.apps.RichTextRecord,
         grammarian: quip.apps.RichTextRecord,
@@ -35,11 +35,15 @@ class RootRecord extends quip.apps.RootRecord {
     })
 
     static getDefaultProperties = () => ({
-        date: { RichText_placeholderText: "When is the meeting?" },
+        date: { RichText_placeholderText: "When is the meeting? Start with @Date" },
         toastmaster: { RichText_placeholderText: "Add a name" },
         jokemaster: { RichText_placeholderText: "Add a name" }, 
         topicsmaster: { RichText_placeholderText: "Add a name" },
         generalEvaluator: { RichText_placeholderText: "Add a name" },
+        speaker1: { RichText_placeholderText: "Add a name" },
+        speechTitle1: { RichText_placeholderText: "Add a speech title" },
+        speaker2: { RichText_placeholderText: "Add a name" },
+        speechTitle2: { RichText_placeholderText: "Add a speech title" },
         speechEvaluator1: { RichText_placeholderText: "Add a name" },
         speechEvaluator2: { RichText_placeholderText: "Add a name" },
         grammarian: { RichText_placeholderText: "Add a name" },
@@ -69,9 +73,7 @@ class Root extends React.Component {
         const _cards = cards.map((card) => { 
             return {
                 number: card.get('number'),
-                details: card.get('details'),
-                // speechTitle: card.get('speechTitle'),
-                // speakerName: card.get('speakerName'),
+                details: card.get('details'), 
             }; 
         });
         const obj = {
@@ -80,16 +82,19 @@ class Root extends React.Component {
             jokemaster: record.get('jokemaster').getTextContent().trim(),
             topicsmaster: record.get('topicsmaster').getTextContent().trim(),
             generalEvaluator: record.get('generalEvaluator').getTextContent().trim(),
+            speaker1: record.get('speaker1').getTextContent().trim(),
+            speechTitle1: record.get('speechTitle1').getTextContent().trim(),
+            speaker2: record.get('speaker2').getTextContent().trim(),
+            speechTitle2: record.get('speechTitle2').getTextContent().trim(),
             speechEvaluator1: record.get('speechEvaluator1').getTextContent().trim(),
             speechEvaluator2: record.get('speechEvaluator2').getTextContent().trim(),
             grammarian: record.get('grammarian').getTextContent().trim(),
             timer: record.get('timer').getTextContent().trim(),
             ahCounter: record.get('ahCounter').getTextContent().trim(),
             speeches: _cards
-        }
+        };
 
         const _str = JSON.stringify(obj);
-        console.log('******************************* all the data', _str);
         quip.apps.openLink('http://output.jsbin.com/maguxep?data=' + encodeURIComponent(_str));
     } 
 
@@ -100,6 +105,10 @@ class Root extends React.Component {
         const jokemaster = record.get("jokemaster"); 
         const topicsmaster = record.get('topicsmaster');
         const generalEvaluator = record.get('generalEvaluator');
+        const speaker1 = record.get('speaker1');
+        const speechTitle1 = record.get('speechTitle1');
+        const speaker2 = record.get('speaker2');
+        const speechTitle2 = record.get('speechTitle2');
         const speechEvaluator1 = record.get('speechEvaluator1');
         const speechEvaluator2 = record.get('speechEvaluator2');
         const grammarian = record.get('grammarian');
@@ -118,12 +127,8 @@ class Root extends React.Component {
                     const _number = card.get('number');
                     return <div>
                     <p>Speaker { _number }</p>
-                    <p>Name <quip.apps.ui.RichTextBox
-                        key={card.getId()}
-                        record={card}
-                    />         </p>           
-                    {/* <p>Speaker name <input type="text" name='' onBlur={ (this) => { this.setSpeech(this.default) }/></p> */}
-                    {/* <p>Speech title <quip.apps.ui.RichTextBox record={  card.get('speechTitle') } /></p> */}
+                    <p>Name: <quip.apps.ui.RichTextBox record={ eval('speaker' + _number) } /></p>
+                    <p>Title: <quip.apps.ui.RichTextBox record={ eval('speechTitle' + _number) } /></p>
                     { card.get('details') ?  
                         <Speechslot card={ card } 
                             removeValue={ this.setSpeech } /> :
@@ -150,11 +155,11 @@ quip.apps.initialize({
         if (params.isCreation) {
             cardList.add({
                 number: 1,
-                // RichText_defaultText: ''
+                details: '',
             });
             cardList.add({
                 number: 2,
-                // RichText_defaultText: ''
+                details: '',
             });
         }
         ReactDOM.render(<Root />, root);
