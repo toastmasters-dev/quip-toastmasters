@@ -52,7 +52,7 @@ class RootRecord extends quip.apps.RootRecord {
 quip.apps.registerClass(RootRecord, "root");
 
 class Root extends React.Component {
-    // _key can be details, speakerName, speechTitle
+    // _key can be details
     setSpeech = (_value, speechInt, _key) => {
         const record = quip.apps.getRootRecord();
         const cards = record.get("cards").getRecords();
@@ -75,7 +75,16 @@ class Root extends React.Component {
             }; 
         });
         const obj = {
-            // toastmaster: record.get('toastmaster').getData(), 
+            date: record.get('date').getTextContent().trim(),
+            toastmaster: record.get('toastmaster').getTextContent().trim(),
+            jokemaster: record.get('jokemaster').getTextContent().trim(),
+            topicsmaster: record.get('topicsmaster').getTextContent().trim(),
+            generalEvaluator: record.get('generalEvaluator').getTextContent().trim(),
+            speechEvaluator1: record.get('speechEvaluator1').getTextContent().trim(),
+            speechEvaluator2: record.get('speechEvaluator2').getTextContent().trim(),
+            grammarian: record.get('grammarian').getTextContent().trim(),
+            timer: record.get('timer').getTextContent().trim(),
+            ahCounter: record.get('ahCounter').getTextContent().trim(),
             speeches: _cards
         }
 
