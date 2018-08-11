@@ -1,0 +1,27 @@
+{
+	"version": "1.0",
+	"data": {
+		"date": "August 7, 2018",
+		"officers": {
+			"president": "KC L.",
+			"VMP": "Anny He"
+		},
+		"items": {
+			"toastmaster": "...",
+			"grammarian": "...",
+			"ah counter": "...",
+			"topicsmaster": "...",
+			"speeches": [{
+				"title": "...",
+				"project": "...",
+				"speaker": "...",
+				"duration": "..."
+			}, {
+				"title": "...",
+				"project": "...",
+				"speaker": "...",
+				"duration": "..."
+			}]
+		}
+	}
+}
