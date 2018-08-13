@@ -1,27 +1,35 @@
 {
-	"version": "1.0",
-	"data": {
-		"date": "August 7, 2018",
-		"officers": {
-			"president": "KC L.",
-			"VMP": "Anny He"
-		},
-		"items": {
-			"toastmaster": "...",
-			"grammarian": "...",
-			"ah counter": "...",
-			"topicsmaster": "...",
-			"speeches": [{
-				"title": "...",
-				"project": "...",
-				"speaker": "...",
-				"duration": "..."
-			}, {
-				"title": "...",
-				"project": "...",
-				"speaker": "...",
-				"duration": "..."
-			}]
-		}
-	}
+    "version": "1.0",
+    "data": {
+        "date": "August 7, 2018",
+        "officers": {
+            "president": "KC Lakshminarasimham",
+            "vpm": "Anny He",
+            "vpe": "Srinath Krishna Ananthakrishnan",
+            "vppr": "Max Kukartsev",
+            "secretary": "Rosaura Arevalo",
+            "soa": "Jack Faraday",
+            "treasurer": "Ron Sison"
+        },
+        "items": {
+            "toastmaster": "Max Kukartsev",
+            "grammarian": "Rosaura Arevalo",
+            "ah counter": "Jack Faraday",
+            "topicsmaster": "Anny He",
+            "speeches": [{
+                "title": "Blah blah blah",
+                "project": "Pathways",
+                "speaker": "KC Lakshminarasimham",
+                "duration": "5-7 minutes"
+            }, {
+            "title": "Bleh Bleh Bleh",
+            "project": "Pathways",
+            "speaker": "Srinath Krishna Ananthakrishnan",
+            "duration": "5-7 minutes"
+            }],
+            "general evaluator": "Ron Sison",
+            "evaluator 1": "Anny He",
+            "evaluator 2": "Max Kukartsev"
+        }
+    }
 }
