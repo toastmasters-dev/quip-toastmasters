@@ -19,15 +19,17 @@
             "timer": "Jack Faraday",
             "topicsmaster": "Anny He",
             "speeches": [{
-                "title": "Blah blah blah",
-                "project": "Pathways",
-                "speaker": "KC Lakshminarasimham",
-                "duration": "5-7 minutes"
+                "number": 1,
+                "details": "PATHWAYS - DYNAMIC LEADERSHIP (L1) EVALUATION AND FEEDBACK #2 (5-7 MIN)",
+                "time": "7 minutes",
+                "speaker1": "Anny He",
+                "speechTitle1": "hello"
             }, {
-            "title": "Bleh Bleh Bleh",
-            "project": "Pathways",
-            "speaker": "Srinath Krishna Ananthakrishnan",
-            "duration": "5-7 minutes"
+                "number": 2,
+                "details": "PATHWAYS - DYNAMIC LEADERSHIP (L1) ICE BREAKER (4-6 MIN)",
+                "time": "6 minutes",
+                "speaker2": "Srinath Krishna Ananthakrishnan",
+                "speechTitle2": "pizza"
             }],
             "general evaluator": "Ron Sison",
             "evaluator 1": "Anny He",
