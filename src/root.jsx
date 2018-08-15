@@ -68,25 +68,7 @@ class Root extends React.Component {
         this.forceUpdate();
     }
 
-    /*
-    JSON will be of form
-    {
-        version: '1.0',
-        data: {
-            date: 'Monday, August 6 2018',
-            toastmaster: 'Anny He',
-            grammarian: 'Srinath Krishna Ananthakrishnan',
-            jokemaster: 'Srinath Krishna Ananthakrishnan',
-            speeches: [
-                speaker1: 'Anny He',
-                speechTitle1: 'I want sushi',
-                time: '13 minutes', 
-                details: 'COMPETENT COMMUNICATION (CC) MANUAL 1) THE ICE BREAKER (4-6 MIN)
-            ]
-            ...
-        }
-    }
-    */
+    // JSON format: refer to agenda.json for details
     openTab = () => {
         const record = quip.apps.getRootRecord();
         const cards = record.get("cards").getRecords();
@@ -94,23 +76,34 @@ class Root extends React.Component {
             return {
                 number: card.get('number'),
                 details: card.get('details'), 
-                time: getTime(card.get('details')),
+                duration: getTime(card.get('details')),
             }; 
         });
         
         // TODO: get from version form manifest.json or another config file
         const obj = { version: '1.0', data: {} };
-        obj.data.speeches = _cards;
+        obj.data.items = { speeches: _cards };
+        obj.data.officers = {
+            president: "KC Lakshminarasimham",
+            vpm: "Anny He",
+            vpe: "Srinath Krishna Ananthakrishnan",
+            vppr: "Max Kukartsev",
+            secretary: "Rosaura Arevalo",
+            soa: "Jack Faraday",
+            treasurer: "Ron Sison"
+        };
         
         Object.keys(record.getData()).forEach((_key) => {            
             if (_key != 'cards') {
                 const _value = record.get(_key).getTextContent().trim();
-                if (_key.startsWith('speaker') || _key.startsWith('speechTitle')) {
+                if (_key === 'date') {
+                    obj.data.date = _value;
+                } else if (_key.startsWith('speaker') || _key.startsWith('speechTitle')) {
                     // get the last character
                     const _index = parseInt(_key.slice(-1)); 
-                    obj.data.speeches[_index - 1][_key] = _value;
+                    obj.data.items.speeches[_index - 1][_key] = _value;
                 } else {
-                    obj.data[_key] = _value;
+                    obj.data.items[_key] = _value;
                 }
             }  
         });        

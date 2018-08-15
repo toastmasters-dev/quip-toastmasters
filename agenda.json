@@ -21,19 +21,19 @@
             "speeches": [{
                 "number": 1,
                 "details": "PATHWAYS - DYNAMIC LEADERSHIP (L1) EVALUATION AND FEEDBACK #2 (5-7 MIN)",
-                "time": "7 minutes",
+                "duration": "7 minutes",
                 "speaker1": "Anny He",
                 "speechTitle1": "hello"
             }, {
                 "number": 2,
                 "details": "PATHWAYS - DYNAMIC LEADERSHIP (L1) ICE BREAKER (4-6 MIN)",
-                "time": "6 minutes",
+                "duration": "6 minutes",
                 "speaker2": "Srinath Krishna Ananthakrishnan",
                 "speechTitle2": "pizza"
             }],
-            "general evaluator": "Ron Sison",
-            "evaluator 1": "Anny He",
-            "evaluator 2": "Max Kukartsev"
+            "generalEvaluator": "Ron Sison",
+            "speechEvaluator1": "Anny He",
+            "speechEvaluator2": "Max Kukartsev"
         }
     }
 }

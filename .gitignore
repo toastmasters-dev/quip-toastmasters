@@ -2,4 +2,4 @@
 app/app.ele
 app/manifest.json
 app/dist
-./node_modules
+node_modules
