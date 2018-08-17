@@ -1,0 +1,41 @@
+{
+    "version": "1.0",
+    "data": {
+        "date": "August 7, 2018",
+        "officers": {
+            "president": "KC Lakshminarasimham",
+            "vpm": "Anny He",
+            "vpe": "Srinath Krishna Ananthakrishnan",
+            "vppr": "Max Kukartsev",
+            "secretary": "Rosaura Arevalo",
+            "soa": "Jack Faraday",
+            "treasurer": "Ron Sison"
+        },
+        "items": {
+            "jokemaster": "[a quasi-funny person]",
+            "toastmaster": "Max Kukartsev",
+            "grammarian": "Rosaura Arevalo",
+            "ah counter": "Jack Faraday",
+            "timer": "Jack Faraday",
+            "topicsmaster": "Anny He",
+            "speeches": [
+                {
+                    "project": "(Just having a project without a track is supported)",
+                    "title": "Blah blah blah",
+                    "speaker": "KC Lakshminarasimham",
+                    "duration": "5-15 minutes"
+                },
+                {
+                    "track": "Pathways - Dynamic Leadership",
+                    "project": "(L1) Evaluation and Feedback #1 (5-7 min)",
+                    "title": "Bleh Bleh Bleh",
+                    "speaker": "Srinath Krishna Ananthakrishnan",
+                    "duration": "5-7 minutes"
+                }
+            ],
+            "general evaluator": "Ron Sison",
+            "evaluator 1": "Anny He",
+            "evaluator 2": "Max Kukartsev"
+        }
+    }
+}
