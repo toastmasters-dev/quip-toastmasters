@@ -1,10 +1,10 @@
 {
     "id": "UDHAjApfBDr",
-    "manifest_version": 1,
-    "name": "Toastmasters",
+    "manifest_version": 2,
+    "name": "Toastmasters App",
     "disable_app_level_comments": true,
     "version_name": "1.0",
-    "version_number": 1,
+    "version_number": 2,
     "sizing_mode": "fit_content",
     "initial_height": 300,
     "initial_width": 300,
