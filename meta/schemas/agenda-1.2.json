@@ -1,0 +1,42 @@
+{
+    "version": "1.2",
+    "data": {
+        "date": "August 7, 2018",
+        "officers": {
+            "president": "KC Lakshminarasimham",
+            "vpm": "Anny He",
+            "vpe": "Srinath Krishna Ananthakrishnan",
+            "vppr": "Max Kukartsev",
+            "secretary": "Rosaura Arevalo",
+            "soa": "Jack Faraday",
+            "treasurer": "Ron Sison"
+        },
+        "items": {
+            "jokemaster": "Tony Stark",
+            "toastmaster": "Max Kukartsev",
+            "grammarian": "Rosaura Arevalo",
+            "ah counter": "Jack Faraday",
+            "timer": "Nicholas Cage",
+            "topicsmaster": "Anny He",
+            "speeches": [
+                {
+                    "track": "Pathways - Dynamic Leadership",
+                    "project": "(L1) Evaluation and Feedback #2 (5-7 min)",
+                    "duration": 7,
+                    "speaker": "Anny He",
+                    "title": "hello",
+                    "evaluator": "Amar She"
+                },
+                {
+                    "track": "Pathways - Dynamic Leadership",
+                    "project": "(L1) Ice Breaker (4-6 min)",
+                    "duration": 6,
+                    "speaker": "Srinath Krishna Ananthakrishnan",
+                    "title": "Why pizza boxes are square, pizzas circular, and pizza slices triangular",
+                    "evaluator": "Max Kukartsev"
+                }
+            ],
+            "general evaluator": "Ron Sison"
+        }
+    }
+}
