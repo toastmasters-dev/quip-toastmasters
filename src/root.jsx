@@ -172,9 +172,11 @@ class Root extends React.Component {
         const jokemaster = record.get("jokemaster"); 
         const topicsmaster = record.get('topicsmaster');
         const generalEvaluator = record.get('generalEvaluator');
-        const speaker1 = record.get('speaker1');
+        const speakerObj = {
+            1: record.get('speaker1'),
+            2: record.get('speaker2'),
+        };
         const speechTitle1 = record.get('speechTitle1');
-        const speaker2 = record.get('speaker2');
         const speechTitle2 = record.get('speechTitle2');
         const evaluator1 = record.get('evaluator1');
         const evaluator2 = record.get('evaluator2');
@@ -192,8 +194,8 @@ class Root extends React.Component {
                     const _number = card.get('number');
                     return <div>
                     <p>Speaker { _number }</p>
-                    <p>Name: <quip.apps.ui.RichTextBox record={ eval('speaker' + _number) } /></p>
-                    <p>Title: <quip.apps.ui.RichTextBox record={ eval('speechTitle' + _number) } /></p>
+                    <p>Name: <quip.apps.ui.RichTextBox record={ speakerObj[_number] } /></p>
+                    <p>Title: <quip.apps.ui.RichTextBox record={ speakerObj[_number] } /></p>
                     { card.get('details') ?  
                         <Speechslot card={ card } 
                             removeValue={ this.setSpeech } /> :
@@ -207,7 +209,10 @@ class Root extends React.Component {
                 <p>grammarian <quip.apps.ui.RichTextBox record={grammarian} /></p>
                 <p>timer <quip.apps.ui.RichTextBox record={timer} /></p>
                 <p>ahCounter <quip.apps.ui.RichTextBox record={ahCounter} /></p>   
-                <button onClick={ this.openTab }>save and print</button>            
+                <quip.apps.ui.Button 
+                    onClick={ this.openTab } 
+                    primary='BLUE'
+                    text='Save and Print'></quip.apps.ui.Button>            
             </div>
         );
     }
