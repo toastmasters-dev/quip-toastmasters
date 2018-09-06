@@ -187,9 +187,13 @@ class Root extends React.Component {
 
         return (
             <div>
-                <p>Meeting date <quip.apps.ui.RichTextBox record={date} /></p>
-                <p>toastmaster <quip.apps.ui.RichTextBox record={toastmaster} /></p>
-                <p>jokemaster <quip.apps.ui.RichTextBox record={jokemaster} /></p>
+                <p>Meeting Date <quip.apps.ui.RichTextBox record={date} /></p>
+                <p>Toastmaster <quip.apps.ui.RichTextBox record={toastmaster} /></p>
+                <p>Grammarian <quip.apps.ui.RichTextBox record={grammarian} /></p>
+                <p>Timer <quip.apps.ui.RichTextBox record={timer} /></p>
+                <p>Ah Counter <quip.apps.ui.RichTextBox record={ahCounter} /></p>
+                <p>Jokemaster <quip.apps.ui.RichTextBox record={jokemaster} /></p>
+                <p>Topicsmaster <quip.apps.ui.RichTextBox record={topicsmaster} /></p>
                 {cards.map((card) => {
                     const _number = card.get('number');
                     return <div>
@@ -202,17 +206,14 @@ class Root extends React.Component {
                         <PickList card={ card } setSpeech={ this.setSpeech } />
                     }</div>
                 })}                 
-                <p>topicsmaster <quip.apps.ui.RichTextBox record={topicsmaster} /></p>
-                <p>generalEvaluator <quip.apps.ui.RichTextBox record={generalEvaluator} /></p>
-                <p>evaluator1 <quip.apps.ui.RichTextBox record={evaluator1} /></p>
-                <p>evaluator2 <quip.apps.ui.RichTextBox record={evaluator2} /></p>
-                <p>grammarian <quip.apps.ui.RichTextBox record={grammarian} /></p>
-                <p>timer <quip.apps.ui.RichTextBox record={timer} /></p>
-                <p>ahCounter <quip.apps.ui.RichTextBox record={ahCounter} /></p>   
+                <p>General Evaluator <quip.apps.ui.RichTextBox record={generalEvaluator} /></p>
+                <p>Evaluator 1 <quip.apps.ui.RichTextBox record={evaluator1} /></p>
+                <p>Evaluator 2 <quip.apps.ui.RichTextBox record={evaluator2} /></p>
                 <quip.apps.ui.Button 
                     onClick={ this.openTab } 
                     primary='BLUE'
-                    text='Save and Print'></quip.apps.ui.Button>            
+                    text='Save and Print'>
+                </quip.apps.ui.Button>
             </div>
         );
     }
