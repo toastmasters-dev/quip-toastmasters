@@ -1662,9 +1662,12 @@ export default class PickList extends React.Component {
     }
      
     render() {
+        const style = {
+            cursor: "pointer"
+        };
         const { card } = this.props;
         const _html = this.state.suggestions.map((_value) => {
-            return <li onClick={ this.setSpeech }>
+            return <li onClick={ this.setSpeech } style={style}>
                 <span class="hl">{_value.manual} {_value.project}</span>
             </li>
         });

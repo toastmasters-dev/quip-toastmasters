@@ -187,7 +187,7 @@ class Root extends React.Component {
 
         return (
             <div>
-                <p>Meeting date <quip.apps.ui.RichTextBox record={date} /></p>
+                <p>Meeting Date <quip.apps.ui.RichTextBox record={date} /></p>
                 <p>Toastmaster <quip.apps.ui.RichTextBox record={toastmaster} /></p>
                 <p>Grammarian <quip.apps.ui.RichTextBox record={grammarian} /></p>
                 <p>Timer <quip.apps.ui.RichTextBox record={timer} /></p>
