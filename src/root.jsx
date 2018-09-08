@@ -147,10 +147,14 @@ class Root extends React.Component {
                 
                 if (_key === 'date') {
                     obj.data.date = _value;
-                } else if (_key.startsWith('speaker') || _key.startsWith('speechTitle')) {
+                } else if (_key.startsWith('speaker')) {
                     // get the last character
-                    const _index = parseInt(_key.slice(-1)); 
-                    obj.data.items.speeches[_index - 1][_key] = _value;
+                    const _index = parseInt(_key.slice(-1));
+                    obj.data.items.speeches[_index - 1]['speaker'] = _value;
+                } else if(_key.startsWith('speechTitle')) {
+                    // get the last character
+                    const _index = parseInt(_key.slice(-1));
+                    obj.data.items.speeches[_index - 1]['title'] = _value;
                 } else {
                     obj.data.items[_key] = _value;
                 }
@@ -161,8 +165,8 @@ class Root extends React.Component {
             orderedPayloadKeys[index] = payloadObject[str];
         });
         this.postToSheet(orderedPayloadKeys);
-        const _str = JSON.stringify(obj);
-        quip.apps.openLink('http://output.jsbin.com/maguxep?data=' + encodeURIComponent(_str));
+        const url = `http://toastmasters-dev.github.io/print-agenda/?data=${encodeURIComponent(JSON.stringify(obj))}`;
+        quip.apps.openLink(url);
     } 
 
     render() {
