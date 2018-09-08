@@ -8,6 +8,6 @@
     "sizing_mode": "fit_content",
     "initial_height": 300,
     "initial_width": 300,
-    "thumbnail": "icons/toastmasters.png",
+    "thumbnail": "icons/toastmasters.svg",
     "js_files": ["dist/app.js"]
 }
