@@ -180,8 +180,10 @@ class Root extends React.Component {
             1: record.get('speaker1'),
             2: record.get('speaker2'),
         };
-        const speechTitle1 = record.get('speechTitle1');
-        const speechTitle2 = record.get('speechTitle2');
+        const speechTitleObj = {
+            1: record.get('speechTitle1'),
+            2: record.get('speechTitle2'),
+        };         
         const evaluator1 = record.get('evaluator1');
         const evaluator2 = record.get('evaluator2');
         const grammarian = record.get('grammarian');
@@ -203,7 +205,7 @@ class Root extends React.Component {
                     return <div>
                     <p>Speaker { _number }</p>
                     <p>Name: <quip.apps.ui.RichTextBox record={ speakerObj[_number] } /></p>
-                    <p>Title: <quip.apps.ui.RichTextBox record={ speakerObj[_number] } /></p>
+                    <p>Title: <quip.apps.ui.RichTextBox record={ speechTitleObj[_number] } /></p>
                     { card.get('details') ?  
                         <Speechslot card={ card } 
                             removeValue={ this.setSpeech } /> :
