@@ -150,11 +150,11 @@ class Root extends React.Component {
                 } else if (_key.startsWith('speaker')) {
                     // get the last character
                     const _index = parseInt(_key.slice(-1));
-                    obj.data.items.speeches[_index - 1]['speaker'] = _value;
+                    obj.data.items.speeches[_index - 1].speaker = _value;
                 } else if(_key.startsWith('speechTitle')) {
                     // get the last character
                     const _index = parseInt(_key.slice(-1));
-                    obj.data.items.speeches[_index - 1]['title'] = _value;
+                    obj.data.items.speeches[_index - 1].title = _value;
                 } else {
                     obj.data.items[_key] = _value;
                 }
@@ -165,7 +165,7 @@ class Root extends React.Component {
             orderedPayloadKeys[index] = payloadObject[str];
         });
         this.postToSheet(orderedPayloadKeys);
-        const url = `http://toastmasters-dev.github.io/print-agenda/?data=${encodeURIComponent(JSON.stringify(obj))}`;
+        const url = `https://toastmasters-dev.github.io/print-agenda/?data=${encodeURIComponent(JSON.stringify(obj))}`;
         quip.apps.openLink(url);
     } 
 
