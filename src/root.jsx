@@ -33,7 +33,7 @@ class RootRecord extends quip.apps.RootRecord {
         grammarian: quip.apps.RichTextRecord,
         timer: quip.apps.RichTextRecord,
         ahCounter: quip.apps.RichTextRecord,         
-        cards: quip.apps.RecordList.Type(SpeechSelect),
+        speakerSlot: quip.apps.RecordList.Type(SpeechSelect),
     })
 
     static getDefaultProperties = () => ({
@@ -51,7 +51,7 @@ class RootRecord extends quip.apps.RootRecord {
         grammarian: { RichText_placeholderText: "Add a name" },
         timer: { RichText_placeholderText: "Add a name" },
         ahCounter: { RichText_placeholderText: "Add a name" },    
-        cards: [],     
+        speakerSlot: [],     
     })
 }
 
@@ -60,8 +60,8 @@ quip.apps.registerClass(RootRecord, "root");
 class Root extends React.Component {
     postToSheet = (_arr) => {
         if (!_arr) return;
-
         const authObject = quip.apps.auth("gdrive");
+
         const jwtKey = authObject.getTokenResponseParam("access_token");
         authObject.request({
             method: 'POST',
@@ -69,9 +69,7 @@ class Root extends React.Component {
             header: { 'Content-Length' : 0, authorization: 'Bearer ' + jwtKey },
             url: 'https://sheets.googleapis.com/v4/spreadsheets/' + spreadSheetId + '/values/Sheet1:append?valueInputOption=USER_ENTERED&alt=json',
         }).then(response => response.json())
-        .then((res) => {
-            const authRes = authObject.getTokenResponseParam("access_token")
-            console.log(authRes)            
+        .then((res) => {       
             console.log(res)
         })
         .catch(error => console.log("update failed", error));   
@@ -79,8 +77,8 @@ class Root extends React.Component {
 
     setSpeech = (_value, speechInt) => {
         const record = quip.apps.getRootRecord();
-        const cards = record.get("cards").getRecords();
-        const _card = cards.filter((card) => card.get('number') === parseInt(speechInt))[0];
+        const speakerSlot = record.get("speakerSlot").getRecords();
+        const _card = speakerSlot.filter((card) => card.get('number') === parseInt(speechInt))[0];
         _card.set('details', _value);        
         
         // Force a render without state change. 
@@ -110,9 +108,9 @@ class Root extends React.Component {
             'evaluator2'
         ];
         const record = quip.apps.getRootRecord();
-        const cards = record.get("cards").getRecords();
+        const speakerSlot = record.get("speakerSlot").getRecords();
         const payloadObject = {}; 
-        const _cards = cards.map((card) => { 
+        const _speakerSlot = speakerSlot.map((card) => { 
             const _number = card.get('number');
             const _details = card.get('details');
             const _duration = getTime(card.get('details'));
@@ -129,7 +127,7 @@ class Root extends React.Component {
         
         // TODO: get from version form manifest.json or another config file
         const obj = { version: '1.0', data: {} };
-        obj.data.items = { speeches: _cards };
+        obj.data.items = { speeches: _speakerSlot };
         obj.data.officers = {
             president: "KC Lakshminarasimham",
             vpm: "Anny He",
@@ -141,7 +139,7 @@ class Root extends React.Component {
         };
         
         Object.keys(record.getData()).forEach((_key) => {     
-            if (_key != 'cards') {
+            if (_key != 'speakerSlot') {
                 const _value = record.get(_key).getTextContent().trim();
                 payloadObject[_key] = _value;
                 
@@ -189,7 +187,7 @@ class Root extends React.Component {
         const grammarian = record.get('grammarian');
         const timer = record.get('timer');
         const ahCounter = record.get('ahCounter');
-        const cards = record.get("cards").getRecords();
+        const speakerSlot = record.get("speakerSlot").getRecords();
 
         return (
             <div>
@@ -200,7 +198,7 @@ class Root extends React.Component {
                 <p>Ah Counter <quip.apps.ui.RichTextBox record={ahCounter} /></p>
                 <p>Jokemaster <quip.apps.ui.RichTextBox record={jokemaster} /></p>
                 <p>Topicsmaster <quip.apps.ui.RichTextBox record={topicsmaster} /></p>
-                {cards.map((card) => {
+                {speakerSlot.map((card) => {
                     const _number = card.get('number');
                     return <div>
                     <p>Speaker { _number }</p>
@@ -228,7 +226,7 @@ class Root extends React.Component {
 quip.apps.initialize({
     initializationCallback: (root, params) => {
         const rootRecord = quip.apps.getRootRecord();
-        const cardList = rootRecord.get("cards");
+        const cardList = rootRecord.get("speakerSlot");
         if (params.isCreation) {
             cardList.add({
                 number: 1,
