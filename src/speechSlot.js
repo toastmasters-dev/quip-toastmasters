@@ -19,7 +19,6 @@ export default class SpeechSlot extends React.Component {
     const speechString = this.props.card.get('details');
     return <div>
       <p>{ speechString }</p>
-      <p>time: { getTime(speechString) }</p>
       <button 
           name={ speechString }
           onClick={ this.removeValue }>Cancel</button>

@@ -1616,12 +1616,34 @@ const speeches = [{
     "project": "(L5 elective) High Performance Leadership (5-7 min)"
 }];
 
-function findMatches(wordToMatch) { 
-    return speeches.filter(place => {
-        const regex = new RegExp(wordToMatch, 'gi');
-        return place.manual.match(regex) || place.project.match(regex)
-    }).slice(0, 5); // only return this many results
-} 
+// Build index of speech objects for normalized searching.
+const index = speeches.map(({manual, project}, i) => ({
+    haystack: normalize(manual + ' ' + project),
+    // Embed original index of the speech item for filtering convenience.
+    i,
+}));
+
+function normalize(string) {
+    // Extract all alphanumeric tokens and join them with spaces.
+    return string.match(/[\w\d]+/g).join(' ');
+}
+
+function findMatches(matchText) {
+    // Return nothing for blank search text to prevent matching everything.
+    if (!matchText) {
+        return [];
+    }
+    // It is okay to construct a regex in this way, since normalized match
+    // text will not contain any special characters.
+    const regex = new RegExp('\\b' + normalize(matchText), 'i');
+    return index
+        // Include only matching index items.
+        .filter(({haystack, i}) => regex.test(haystack))
+        // Get speech object for each matching index item.
+        .map(({i}) => speeches[i])
+        // Limit maximum number of results returned.
+        .slice(0, 8);
+}
 
 export default class PickList extends React.Component {
     static propTypes = {
