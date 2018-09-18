@@ -66,7 +66,7 @@ class Root extends React.Component {
         authObject.request({
             method: 'POST',
             data: { "values": [_arr] },
-            headers: { 'Content-Length' : 0, authorization: 'Bearer ' + jwtKey },
+            headers: { 'Authorization': 'Bearer ' + jwtKey },
             url: 'https://sheets.googleapis.com/v4/spreadsheets/' + spreadSheetId + '/values/Sheet1:append?valueInputOption=USER_ENTERED&alt=json',
         }).then(response => response.json())
         .then((res) => {       
