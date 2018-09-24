@@ -58,23 +58,38 @@ class RootRecord extends quip.apps.RootRecord {
 quip.apps.registerClass(RootRecord, "root");
 
 class Root extends React.Component {
-    postToSheet = (_arr) => {
-        if (!_arr) return;
+    postToPath(_arr, tryRefresh = true) {
         const authObject = quip.apps.auth("gdrive");
-
         const jwtKey = authObject.getTokenResponseParam("access_token");
-        authObject.request({
+        const requestParams = {
             method: 'POST',
             data: { "values": [_arr] },
-            headers: { 'Authorization': 'Bearer ' + jwtKey },
+            headers: { 'authorization': 'Bearer ' + jwtKey },
             url: 'https://sheets.googleapis.com/v4/spreadsheets/' + spreadSheetId + '/values/Sheet1:append?valueInputOption=USER_ENTERED&alt=json',
-        }).then(response => response.json())
-        .then((res) => {       
-            console.log(res)
-        })
-        .catch(error => console.log("update failed", error));   
+        };
+        return authObject.request(requestParams).then(response => {
+            if (response.status == 401 && tryRefresh) {
+                return this.refreshToken().then(response =>
+                    this.postToPath(_arr, false)
+                );
+            } else if (response.ok) {
+                return response.json();
+            } else {
+                return Promise.reject();
+            }
+        });
     }
 
+    refreshToken() {
+        return quip.apps.auth("gdrive").refreshToken().then(response => {
+            if (response && response.ok) {
+                return response;
+            } else {
+                return Promise.reject(response);
+            }
+        });
+    } 
+    
     setSpeech = (_value, speechInt) => {
         const record = quip.apps.getRootRecord();
         const speakerSlot = record.get("speakerSlot").getRecords();
@@ -162,7 +177,7 @@ class Root extends React.Component {
         orderedPayloadKeys.forEach((str, index) => {
             orderedPayloadKeys[index] = payloadObject[str];
         });
-        this.postToSheet(orderedPayloadKeys);
+        this.postToPath(orderedPayloadKeys);
         const url = `https://toastmasters-dev.github.io/print-agenda/?data=${encodeURIComponent(JSON.stringify(obj))}`;
         quip.apps.openLink(url);
     } 
