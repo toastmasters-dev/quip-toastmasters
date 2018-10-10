@@ -1,7 +1,23 @@
 import PickList from "./pickList";
 import Speechslot from "./speechSlot";
 import { getTime } from './utils';
-const spreadSheetId = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
+
+const SPREADSHEET_ID = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
+const ROLES = new Set([
+    'toastmaster',
+    'date',
+    'toastmaster',
+    'jokemaster',
+    'topicsmaster',
+    'generalEvaluator',
+    'speaker1',
+    'speaker2',
+    'evaluator1',
+    'evaluator2',
+    'grammarian',
+    'timer',
+    'ahCounter',
+]);
 
 class SpeechSelect extends quip.apps.RichTextRecord {
     static getProperties = () => ({
@@ -65,7 +81,11 @@ class Root extends React.Component {
             method: 'POST',
             data: { "values": [_arr] },
             headers: { 'authorization': 'Bearer ' + jwtKey },
-            url: 'https://sheets.googleapis.com/v4/spreadsheets/' + spreadSheetId + '/values/Sheet1:append?valueInputOption=USER_ENTERED&alt=json',
+            url: (
+                `https://sheets.googleapis.com/v4/spreadsheets/` +
+                `${SPREADSHEET_ID}/values/Sheet1:append?` +
+                `valueInputOption=USER_ENTERED&alt=json`
+            ),
         };
         return authObject.request(requestParams).then(response => {
             if (response.status == 401 && tryRefresh) {
@@ -154,24 +174,31 @@ class Root extends React.Component {
         };
         
         Object.keys(record.getData()).forEach((_key) => {     
-            if (_key != 'speakerSlot') {
-                const _value = record.get(_key).getTextContent().trim();
-                payloadObject[_key] = _value;
-                
-                if (_key === 'date') {
-                    obj.data.date = _value;
-                } else if (_key.startsWith('speaker')) {
-                    // get the last character
-                    const _index = parseInt(_key.slice(-1));
-                    obj.data.items.speeches[_index - 1].speaker = _value;
-                } else if(_key.startsWith('speechTitle')) {
-                    // get the last character
-                    const _index = parseInt(_key.slice(-1));
-                    obj.data.items.speeches[_index - 1].title = _value;
-                } else {
-                    obj.data.items[_key] = _value;
-                }
-            }  
+            if (_key === 'speakerSlot') {
+                return;
+            }
+
+            const _keyRecord = record.get(_key);
+            // If this key corresponds to one of the roles, extract the name
+            // of the @-mentioned person from the raw rich text content.
+            const _value = ROLES.has(_key)
+                ? getNameFromRichTextContent(_keyRecord)
+                : _keyRecord.getTextContent().trim();
+            payloadObject[_key] = _value;
+
+            if (_key === 'date') {
+                obj.data.date = _value;
+            } else if (_key.startsWith('speaker')) {
+                // get the last character
+                const _index = parseInt(_key.slice(-1));
+                obj.data.items.speeches[_index - 1].speaker = _value;
+            } else if(_key.startsWith('speechTitle')) {
+                // get the last character
+                const _index = parseInt(_key.slice(-1));
+                obj.data.items.speeches[_index - 1].title = _value;
+            } else {
+                obj.data.items[_key] = _value;
+            }
         });        
 
         orderedPayloadKeys.forEach((str, index) => {
@@ -255,3 +282,16 @@ quip.apps.initialize({
         ReactDOM.render(<Root />, root);
     },
 });
+
+function getNameFromRichTextContent(richTextRecord) {
+    if (richTextRecord.empty()) {
+        return '';
+    }
+
+    const value = richTextRecord.getTextContent().trim()
+    const match = value.match(/\[(.+?)\]\(https:\/\/[^\/]+\/\w+\)/);
+
+    if (match) {
+        return match[1];
+    }
+}
