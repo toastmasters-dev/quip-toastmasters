@@ -287,11 +287,10 @@ function getNameFromRichTextContent(richTextRecord) {
     if (richTextRecord.empty()) {
         return '';
     }
-
     const value = richTextRecord.getTextContent().trim()
     const match = value.match(/\[(.+?)\]\(https:\/\/[^\/]+\/\w+\)/);
-
     if (match) {
         return match[1];
     }
+    return value;
 }
