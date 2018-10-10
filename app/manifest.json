@@ -3,10 +3,13 @@
     "manifest_version": 4,
     "name": "Toastmasters App",
     "disable_app_level_comments": true,
-    "version_name": "1.0",
-    "version_number": 5,
+    "version_name": "1.1",
+    "version_number": 6,
     "sizing_mode": "fit_content",
     "initial_height": 300,
     "initial_width": 300,
+    "thumbnail": "icons/thumbnail.svg",
+    "toolbar_icon": "icons/toolbar.svg",
+    "toolbar_color": "red",
     "js_files": ["dist/app.js"]
 }
