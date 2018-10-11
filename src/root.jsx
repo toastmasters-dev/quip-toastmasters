@@ -1,6 +1,7 @@
 import PickList from "./pickList";
 import Speechslot from "./speechSlot";
 import { getTime } from './utils';
+import './root.css';
 
 const SPREADSHEET_ID = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
 const ROLES = new Set([
@@ -37,7 +38,7 @@ class RootRecord extends quip.apps.RootRecord {
     static getProperties = () => ({
         date: quip.apps.RichTextRecord,
         toastmaster: quip.apps.RichTextRecord,
-        jokemaster: quip.apps.RichTextRecord,       
+        jokemaster: quip.apps.RichTextRecord,
         topicsmaster: quip.apps.RichTextRecord,
         generalEvaluator: quip.apps.RichTextRecord,
         speaker1: quip.apps.RichTextRecord,
@@ -48,14 +49,14 @@ class RootRecord extends quip.apps.RootRecord {
         evaluator2: quip.apps.RichTextRecord,
         grammarian: quip.apps.RichTextRecord,
         timer: quip.apps.RichTextRecord,
-        ahCounter: quip.apps.RichTextRecord,         
+        ahCounter: quip.apps.RichTextRecord,
         speakerSlot: quip.apps.RecordList.Type(SpeechSelect),
     })
 
     static getDefaultProperties = () => ({
         date: { RichText_placeholderText: "When is the meeting? Start with @Date" },
         toastmaster: { RichText_placeholderText: "Add a name" },
-        jokemaster: { RichText_placeholderText: "Add a name" }, 
+        jokemaster: { RichText_placeholderText: "Add a name" },
         topicsmaster: { RichText_placeholderText: "Add a name" },
         generalEvaluator: { RichText_placeholderText: "Add a name" },
         speaker1: { RichText_placeholderText: "Add a name" },
@@ -66,8 +67,8 @@ class RootRecord extends quip.apps.RootRecord {
         evaluator2: { RichText_placeholderText: "Add a name" },
         grammarian: { RichText_placeholderText: "Add a name" },
         timer: { RichText_placeholderText: "Add a name" },
-        ahCounter: { RichText_placeholderText: "Add a name" },    
-        speakerSlot: [],     
+        ahCounter: { RichText_placeholderText: "Add a name" },
+        speakerSlot: [],
     })
 }
 
@@ -108,15 +109,15 @@ class Root extends React.Component {
                 return Promise.reject(response);
             }
         });
-    } 
-    
+    }
+
     setSpeech = (_value, speechInt) => {
         const record = quip.apps.getRootRecord();
         const speakerSlot = record.get("speakerSlot").getRecords();
         const _card = speakerSlot.filter((card) => card.get('number') === parseInt(speechInt))[0];
-        _card.set('details', _value);        
-        
-        // Force a render without state change. 
+        _card.set('details', _value);
+
+        // Force a render without state change.
         // to show speech details
         this.forceUpdate();
     }
@@ -144,8 +145,8 @@ class Root extends React.Component {
         ];
         const record = quip.apps.getRootRecord();
         const speakerSlot = record.get("speakerSlot").getRecords();
-        const payloadObject = {}; 
-        const _speakerSlot = speakerSlot.map((card) => { 
+        const payloadObject = {};
+        const _speakerSlot = speakerSlot.map((card) => {
             const _number = card.get('number');
             const _details = card.get('details');
             const _duration = getTime(card.get('details'));
@@ -156,10 +157,10 @@ class Root extends React.Component {
                 number: _number,
                 details: _details,
                 duration: _duration,
-            }; 
+            };
         });
 
-        
+
         // TODO: get from version form manifest.json or another config file
         const obj = { version: '1.0', data: {} };
         obj.data.items = { speeches: _speakerSlot };
@@ -172,8 +173,8 @@ class Root extends React.Component {
             soa: "Jack Faraday",
             treasurer: "Ron Sison"
         };
-        
-        Object.keys(record.getData()).forEach((_key) => {     
+
+        Object.keys(record.getData()).forEach((_key) => {
             if (_key === 'speakerSlot') {
                 return;
             }
@@ -199,7 +200,7 @@ class Root extends React.Component {
             } else {
                 obj.data.items[_key] = _value;
             }
-        });        
+        });
 
         orderedPayloadKeys.forEach((str, index) => {
             orderedPayloadKeys[index] = payloadObject[str];
@@ -207,13 +208,13 @@ class Root extends React.Component {
         this.postToPath(orderedPayloadKeys);
         const url = `https://toastmasters-dev.github.io/print-agenda/?data=${encodeURIComponent(JSON.stringify(obj))}`;
         quip.apps.openLink(url);
-    } 
+    }
 
     render() {
         const record = quip.apps.getRootRecord();
         const date = record.get("date");
         const toastmaster = record.get("toastmaster");
-        const jokemaster = record.get("jokemaster"); 
+        const jokemaster = record.get("jokemaster");
         const topicsmaster = record.get('topicsmaster');
         const generalEvaluator = record.get('generalEvaluator');
         const speakerObj = {
@@ -223,44 +224,99 @@ class Root extends React.Component {
         const speechTitleObj = {
             1: record.get('speechTitle1'),
             2: record.get('speechTitle2'),
-        };         
+        };
         const evaluator1 = record.get('evaluator1');
         const evaluator2 = record.get('evaluator2');
         const grammarian = record.get('grammarian');
         const timer = record.get('timer');
         const ahCounter = record.get('ahCounter');
-        const speakerSlot = record.get("speakerSlot").getRecords();
+        const speakerSlots = record
+            .get("speakerSlot")
+            .getRecords()
+            .map(card => {
+                const _number = card.get('number');
+                return (
+                    <tr>
+                        <td>Speaker {_number}</td>
+                        <td>
+                            <quip.apps.ui.RichTextBox
+                                record={speakerObj[_number]}
+                            />
+                        <div className="speechTitle">
+                            <span>Title:</span>
+                            <quip.apps.ui.RichTextBox
+                                record={speechTitleObj[_number]}
+                            />
+                        </div>
+                        {
+                            card.get('details') ?
+                                <Speechslot
+                                    card={card}
+                                    removeValue={this.setSpeech}
+                                /> :
+                                <PickList
+                                    card={card}
+                                    setSpeech={this.setSpeech}
+                                />
+                        }
+                        </td>
+                    </tr>
+                );
+            });
 
         return (
-            <div>
-                <p>Meeting Date <quip.apps.ui.RichTextBox record={date} /></p>
-                <p>Toastmaster <quip.apps.ui.RichTextBox record={toastmaster} /></p>
-                <p>Grammarian <quip.apps.ui.RichTextBox record={grammarian} /></p>
-                <p>Timer <quip.apps.ui.RichTextBox record={timer} /></p>
-                <p>Ah Counter <quip.apps.ui.RichTextBox record={ahCounter} /></p>
-                <p>Jokemaster <quip.apps.ui.RichTextBox record={jokemaster} /></p>
-                <p>Topicsmaster <quip.apps.ui.RichTextBox record={topicsmaster} /></p>
-                {speakerSlot.map((card) => {
-                    const _number = card.get('number');
-                    return <div>
-                    <p>Speaker { _number }</p>
-                    <p>Name: <quip.apps.ui.RichTextBox record={ speakerObj[_number] } /></p>
-                    <p>Title: <quip.apps.ui.RichTextBox record={ speechTitleObj[_number] } /></p>
-                    { card.get('details') ?  
-                        <Speechslot card={ card } 
-                            removeValue={ this.setSpeech } /> :
-                        <PickList card={ card } setSpeech={ this.setSpeech } />
-                    }</div>
-                })}                 
-                <p>General Evaluator <quip.apps.ui.RichTextBox record={generalEvaluator} /></p>
-                <p>Evaluator 1 <quip.apps.ui.RichTextBox record={evaluator1} /></p>
-                <p>Evaluator 2 <quip.apps.ui.RichTextBox record={evaluator2} /></p>
-                <quip.apps.ui.Button 
-                    onClick={ this.openTab } 
-                    primary='BLUE'
-                    text='Save and Print'>
-                </quip.apps.ui.Button>
-            </div>
+            <table className="root">
+                <tr>
+                    <td>Meeting Date</td>
+                    <td><quip.apps.ui.RichTextBox record={date} /></td>
+                </tr>
+                <tr>
+                    <td>Toastmaster</td>
+                    <td><quip.apps.ui.RichTextBox record={toastmaster} /></td>
+                </tr>
+                <tr>
+                    <td>Grammarian</td>
+                    <td><quip.apps.ui.RichTextBox record={grammarian} /></td>
+                </tr>
+                <tr>
+                    <td>Timer</td>
+                    <td><quip.apps.ui.RichTextBox record={timer} /></td>
+                </tr>
+                <tr>
+                    <td>Ah Counter</td>
+                    <td><quip.apps.ui.RichTextBox record={ahCounter} /></td>
+                </tr>
+                <tr>
+                    <td>Jokemaster</td>
+                    <td><quip.apps.ui.RichTextBox record={jokemaster} /></td>
+                </tr>
+                <tr>
+                    <td>Topicsmaster</td>
+                    <td><quip.apps.ui.RichTextBox record={topicsmaster} /></td>
+                </tr>
+                {speakerSlots}
+                <tr>
+                    <td>General Evaluator</td>
+                    <td><quip.apps.ui.RichTextBox record={generalEvaluator} /></td>
+                </tr>
+                <tr>
+                    <td>Evaluator 1</td>
+                    <td><quip.apps.ui.RichTextBox record={evaluator1} /></td>
+                </tr>
+                <tr>
+                    <td>Evaluator 2</td>
+                    <td><quip.apps.ui.RichTextBox record={evaluator2} /></td>
+                </tr>
+                <tr>
+                    <td colSpan="2">
+                        <quip.apps.ui.Button
+                            onClick={this.openTab}
+                            primary='BLUE'
+                            text='Save and Print'
+                        />
+                    </td>
+                </tr>
+            </table>
         );
     }
 }

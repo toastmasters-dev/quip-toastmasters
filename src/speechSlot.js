@@ -7,21 +7,26 @@ expect: 7
 var test3 = "4) The Press Conference (3-5 min; 2-3 min for Q&amp;A)"
 expect: 8
 */
+
 import { getTime } from './utils';
+import './speechSlot.css';
 
 export default class SpeechSlot extends React.Component {
-  removeValue = () => {
-    const speechNum = this.props.card.get('number');
-    this.props.removeValue('', speechNum);
-  }
+    removeValue = () => {
+        const speechNum = this.props.card.get('number');
+        this.props.removeValue('', speechNum);
+    }
 
-  render() {
-    const speechString = this.props.card.get('details');
-    return <div>
-      <p>{ speechString }</p>
-      <button 
-          name={ speechString }
-          onClick={ this.removeValue }>Cancel</button>
-  </div> 
-  }
+    render() {
+        const speechString = this.props.card.get('details');
+        return (
+            <div className="speechSlot">
+                <span>{ speechString }</span>
+                <br />
+                <button name={ speechString } onClick={ this.removeValue }>
+                    Cancel
+                </button>
+            </div>
+        );
+    }
 }

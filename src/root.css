@@ -1,0 +1,24 @@
+.root td {
+    padding: 0.5rem 0.5rem 0 0;
+}
+
+.root td:first-child:not([colspan]) {
+    font-weight: bold;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+/* Use :nth-child(2) instead of :last-child to exclude single <td> */
+.root td:nth-child(2) {
+    width: 100%;
+}
+
+.root .speechTitle {
+    display: flex;
+    margin: 0.25rem 0;
+}
+
+.root .speechTitle > :last-child {
+    margin-left: 0.25rem;
+    flex-grow: 1;
+}

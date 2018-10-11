@@ -1,3 +1,5 @@
+import './pickList.css';
+
 // import fs from 'fs'; // not working with webpack
 // TODO: import this from speeches.json
 const speeches = [{
@@ -1648,7 +1650,7 @@ function findMatches(matchText) {
 export default class PickList extends React.Component {
     static propTypes = {
         setSelectedSpeech: React.PropTypes.function,
-    };    
+    };
 
     constructor(props) {
         super(props);
@@ -1656,7 +1658,7 @@ export default class PickList extends React.Component {
             value: '',
             suggestions: [],
         }
-    }     
+    }
 
     componentDidMount() {
         this.setState({value : this.props.card.get('details')});
@@ -1667,43 +1669,49 @@ export default class PickList extends React.Component {
     }
 
     setSpeech = (event) => {
-        const _value = event.target.textContent.trim().toUpperCase();
+        const _value = event.target.textContent.trim();
         const speechInt = event.target.parentNode.parentNode.title;
         this.props.setSpeech(_value, speechInt);
         // hide suggestions
         this.setState({ suggestions: [] });
     }
-     
+
     displayMatches = (event) => {
         const _value = event.target.value;
         const matchArray = findMatches(_value);
-        this.setState({ 
+        this.setState({
             suggestions: matchArray,
             value: _value,
         });
     }
-     
-    render() {
-        const style = {
-            cursor: "pointer"
-        };
-        const { card } = this.props;
-        const _html = this.state.suggestions.map((_value) => {
-            return <li onClick={ this.setSpeech } style={style}>
-                <span class="hl">{_value.manual} {_value.project}</span>
-            </li>
-        });
 
-        return <div>
-            <input type="text" 
-                onChange={ this.displayMatches }
-                class="search" 
-                value={ this.state.value }
-                placeholder="Choose Manual / Speech"/>
-            <ul title={ card.get("number") } class="suggestions">
-                { _html }
-            </ul>
-        </div>
+    render() {
+        const { card } = this.props;
+        const _html = this.state.suggestions.map(_value =>
+            <li>
+                <span onClick={this.setSpeech}>
+                    {_value.manual} {_value.project}
+                </span>
+            </li>
+        );
+
+        return (
+            <div className="pickList">
+                <input
+                    type="text"
+                    onChange={this.displayMatches}
+                    class="search"
+                    value={this.state.value}
+                    placeholder="Choose Manual / Speech"
+                />
+                <ul
+                    title={card.get("number")}
+                    class="suggestions"
+                    style={{display: _html.length ? 'block' : 'none'}}
+                >
+                    {_html}
+                </ul>
+            </div>
+        );
     }
 }
-
