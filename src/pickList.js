@@ -1670,8 +1670,7 @@ export default class PickList extends React.Component {
 
     setSpeech = (event) => {
         const _value = event.target.textContent.trim();
-        const speechInt = event.target.parentNode.parentNode.title;
-        this.props.setSpeech(_value, speechInt);
+        this.props.setSpeech(_value);
         // hide suggestions
         this.setState({ suggestions: [] });
     }
@@ -1694,6 +1693,7 @@ export default class PickList extends React.Component {
                 </span>
             </li>
         );
+        const display = _html.length ? 'block' : 'none';
 
         return (
             <div className="pickList">
@@ -1702,13 +1702,9 @@ export default class PickList extends React.Component {
                     onChange={this.displayMatches}
                     class="search"
                     value={this.state.value}
-                    placeholder="Choose Manual / Speech"
+                    placeholder="Choose speech"
                 />
-                <ul
-                    title={card.get("number")}
-                    class="suggestions"
-                    style={{display: _html.length ? 'block' : 'none'}}
-                >
+                <ul class="suggestions" style={{display}}>
                     {_html}
                 </ul>
             </div>

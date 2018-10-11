@@ -21,13 +21,9 @@ const ROLES = new Set([
 ]);
 
 class SpeechSelect extends quip.apps.RichTextRecord {
-    static getProperties = () => ({
-        number: "number",
-        details: "string",
-    });
+    static getProperties = () => ({details: 'string'});
 
     static getDefaultProperties = () => ({
-        number: 0,
         details: { RichText_placeholderText: "Which project and manual is the speech?" },
     });
 }
@@ -111,14 +107,13 @@ class Root extends React.Component {
         });
     }
 
-    setSpeech = (_value, speechInt) => {
+    setSpeech(speechInt, _value) {
         const record = quip.apps.getRootRecord();
-        const speakerSlot = record.get("speakerSlot").getRecords();
-        const _card = speakerSlot.filter((card) => card.get('number') === parseInt(speechInt))[0];
-        _card.set('details', _value);
+        // Get speech record by index - 1 less than the speech number.
+        const card = record.get('speakerSlot').get(speechInt - 1);
+        card.set('details', _value);
 
-        // Force a render without state change.
-        // to show speech details
+        // Force a render without state change to show speech details.
         this.forceUpdate();
     }
 
@@ -141,37 +136,41 @@ class Root extends React.Component {
             'duration2',
             'generalEvaluator',
             'evaluator1',
-            'evaluator2'
+            'evaluator2',
         ];
         const record = quip.apps.getRootRecord();
         const speakerSlot = record.get("speakerSlot").getRecords();
         const payloadObject = {};
-        const _speakerSlot = speakerSlot.map((card) => {
-            const _number = card.get('number');
-            const _details = card.get('details');
-            const _duration = getTime(card.get('details'));
-            payloadObject['project' + _number] = _details;
-            payloadObject['duration' + _number] = _duration;
+        const _speakerSlot = speakerSlot.map((card, i) => {
+            // The speech number is 1 greater than the speech index.
+            const _number = i + 1;
+            const details = card.get('details');
+            const duration = getTime(card.get('details'));
+            payloadObject['project' + _number] = details;
+            payloadObject['duration' + _number] = duration;
 
             return {
-                number: _number,
-                details: _details,
-                duration: _duration,
+                project: details,
+                duration,
             };
         });
 
 
-        // TODO: get from version form manifest.json or another config file
-        const obj = { version: '1.0', data: {} };
-        obj.data.items = { speeches: _speakerSlot };
-        obj.data.officers = {
-            president: "KC Lakshminarasimham",
-            vpm: "Anny He",
-            vpe: "Srinath Krishna Ananthakrishnan",
-            vppr: "Max Kukartsev",
-            secretary: "Rosaura Arevalo",
-            soa: "Jack Faraday",
-            treasurer: "Ron Sison"
+        // TODO: get version form manifest.json or another config file
+        const obj = {
+            version: '1.0',
+            data: {
+                officers: {
+                    president: 'KC Lakshminarasimham',
+                    vpm: 'Anny He',
+                    vpe: 'Srinath Krishna Ananthakrishnan',
+                    vppr: 'Max Kukartsev',
+                    secretary: 'Rosaura Arevalo',
+                    soa: 'Jack Faraday',
+                    treasurer: 'Ron Sison',
+                },
+                items: {speeches: _speakerSlot},
+            },
         };
 
         Object.keys(record.getData()).forEach((_key) => {
@@ -205,9 +204,15 @@ class Root extends React.Component {
         orderedPayloadKeys.forEach((str, index) => {
             orderedPayloadKeys[index] = payloadObject[str];
         });
+
+        // Save agenda data to Google Sheet.
         this.postToPath(orderedPayloadKeys);
-        const url = `https://toastmasters-dev.github.io/print-agenda/?data=${encodeURIComponent(JSON.stringify(obj))}`;
-        quip.apps.openLink(url);
+
+        // Open print agenda page in new tab.
+        quip.apps.openLink(
+            'https://toastmasters-dev.github.io/print-agenda/?data=' +
+            encodeURIComponent(JSON.stringify(obj)),
+        );
     }
 
     render() {
@@ -230,11 +235,16 @@ class Root extends React.Component {
         const grammarian = record.get('grammarian');
         const timer = record.get('timer');
         const ahCounter = record.get('ahCounter');
+
         const speakerSlots = record
-            .get("speakerSlot")
+            .get('speakerSlot')
             .getRecords()
-            .map(card => {
-                const _number = card.get('number');
+            .map((card, i) => {
+                // The speech number is 1 greater than the speech index.
+                const _number = i + 1;
+                // Make callback specific to this speech number.
+                const setSpeech = this.setSpeech.bind(this, _number);
+
                 return (
                     <tr>
                         <td>Speaker {_number}</td>
@@ -252,11 +262,11 @@ class Root extends React.Component {
                             card.get('details') ?
                                 <Speechslot
                                     card={card}
-                                    removeValue={this.setSpeech}
+                                    removeValue={setSpeech}
                                 /> :
                                 <PickList
                                     card={card}
-                                    setSpeech={this.setSpeech}
+                                    setSpeech={setSpeech}
                                 />
                         }
                         </td>
@@ -326,14 +336,8 @@ quip.apps.initialize({
         const rootRecord = quip.apps.getRootRecord();
         const cardList = rootRecord.get("speakerSlot");
         if (params.isCreation) {
-            cardList.add({
-                number: 1,
-                details: '',
-            });
-            cardList.add({
-                number: 2,
-                details: '',
-            });
+            cardList.add({details: ''});
+            cardList.add({details: ''});
         }
         ReactDOM.render(<Root />, root);
     },

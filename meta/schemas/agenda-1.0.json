@@ -15,7 +15,7 @@
             "jokemaster": "[a quasi-funny person]",
             "toastmaster": "Max Kukartsev",
             "grammarian": "Rosaura Arevalo",
-            "ah counter": "Jack Faraday",
+            "ahCounter": "Jack Faraday",
             "timer": "Jack Faraday",
             "topicsmaster": "Anny He",
             "speeches": [
@@ -33,9 +33,9 @@
                     "duration": "5-7 minutes"
                 }
             ],
-            "general evaluator": "Ron Sison",
-            "evaluator 1": "Anny He",
-            "evaluator 2": "Max Kukartsev"
+            "generalEvaluator": "Ron Sison",
+            "evaluator1": "Anny He",
+            "evaluator2": "Max Kukartsev"
         }
     }
 }
