@@ -4,7 +4,7 @@
     "name": "Toastmasters App",
     "disable_app_level_comments": true,
     "version_name": "1.2",
-    "version_number": 7,
+    "version_number": 8,
     "sizing_mode": "fill_container",
     "initial_height": 300,
     "initial_width": 300,
