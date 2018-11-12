@@ -4,4 +4,4 @@
 
 go to a quip doc
 
-type `@Toastmasters App` to get started
+type `@Toastmasters Agenda` to get started
