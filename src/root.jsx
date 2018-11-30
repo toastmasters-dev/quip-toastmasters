@@ -23,12 +23,12 @@ const ROLES = new Set([
 class SpeechSelect extends quip.apps.RichTextRecord {
     static getProperties = () => ({details: 'string'});
 
-    static getDefaultProperties = () => ({
-        details: { RichText_placeholderText: "Which project and manual is the speech?" },
-    });
+    static getDefaultProperties = () => ({details: ''});
 }
 
-quip.apps.registerClass(SpeechSelect, "draggable-card");
+quip.apps.registerClass(SpeechSelect, 'draggable-card');
+
+const NAME_PROMPT = 'Add a name using @Person';
 
 class RootRecord extends quip.apps.RootRecord {
     static getProperties = () => ({
@@ -50,25 +50,36 @@ class RootRecord extends quip.apps.RootRecord {
     })
 
     static getDefaultProperties = () => ({
-        date: { RichText_placeholderText: "When is the meeting? Start with @Date" },
-        toastmaster: { RichText_placeholderText: "Add a name" },
-        jokemaster: { RichText_placeholderText: "Add a name" },
-        topicsmaster: { RichText_placeholderText: "Add a name" },
-        generalEvaluator: { RichText_placeholderText: "Add a name" },
-        speaker1: { RichText_placeholderText: "Add a name" },
+        date: {
+            RichText_placeholderText: "When is the meeting? Start with @Date",
+        },
+        toastmaster: { RichText_placeholderText: NAME_PROMPT },
+        jokemaster: { RichText_placeholderText: NAME_PROMPT },
+        topicsmaster: { RichText_placeholderText: NAME_PROMPT },
+        generalEvaluator: { RichText_placeholderText: NAME_PROMPT },
+        speaker1: { RichText_placeholderText: NAME_PROMPT },
         speechTitle1: { RichText_placeholderText: "Add a speech title" },
-        speaker2: { RichText_placeholderText: "Add a name" },
+        speaker2: { RichText_placeholderText: NAME_PROMPT },
         speechTitle2: { RichText_placeholderText: "Add a speech title" },
-        evaluator1: { RichText_placeholderText: "Add a name" },
-        evaluator2: { RichText_placeholderText: "Add a name" },
-        grammarian: { RichText_placeholderText: "Add a name" },
-        timer: { RichText_placeholderText: "Add a name" },
-        ahCounter: { RichText_placeholderText: "Add a name" },
+        evaluator1: { RichText_placeholderText: NAME_PROMPT },
+        evaluator2: { RichText_placeholderText: NAME_PROMPT },
+        grammarian: { RichText_placeholderText: NAME_PROMPT },
+        timer: { RichText_placeholderText: NAME_PROMPT },
+        ahCounter: { RichText_placeholderText: NAME_PROMPT },
         speakerSlot: [],
     })
 }
 
-quip.apps.registerClass(RootRecord, "root");
+quip.apps.registerClass(RootRecord, 'root');
+
+const PlainRichTextBox = props => (
+    <quip.apps.ui.RichTextBox
+        {...props}
+        allowedStyles={[quip.apps.RichTextRecord.Style.TEXT_PLAIN]}
+        allowedInlineStyles={[]}
+        disableInlineMenus={true}
+    />
+);
 
 class Root extends React.Component {
     postToPath(_arr, tryRefresh = true) {
@@ -107,11 +118,12 @@ class Root extends React.Component {
         });
     }
 
-    setSpeech(speechInt, _value) {
-        const record = quip.apps.getRootRecord();
-        // Get speech record by index - 1 less than the speech number.
-        const card = record.get('speakerSlot').get(speechInt - 1);
-        card.set('details', _value);
+    setSpeech(speechInt, value) {
+        quip.apps.getRootRecord()
+            .get('speakerSlot')
+            // Get speech record by index - 1 less than the speech number.
+            .get(speechInt - 1)
+            .set('details', value);
 
         // Force a render without state change to show speech details.
         this.forceUpdate();
@@ -215,6 +227,39 @@ class Root extends React.Component {
         );
     }
 
+    getSpeakerSlotRow(speakerObj, speechTitleObj, card, i) {
+        // The speech number is 1 greater than the speech index.
+        const number = i + 1;
+        // Make callback specific to this speech number.
+        const setSpeech = this.setSpeech.bind(this, number);
+
+        return (
+            <tr key={i}>
+                <td>Speaker {number}</td>
+                <td>
+                    <PlainRichTextBox record={speakerObj[number]} />
+                    <div className="speechTitle">
+                        <span>Title:</span>
+                        <PlainRichTextBox record={speechTitleObj[number]} />
+                    </div>
+                    {
+                        card.get('details') ? (
+                            <Speechslot
+                                card={card}
+                                removeValue={() => setSpeech('')}
+                            />
+                        ) : (
+                            <PickList
+                                card={card}
+                                setSpeech={setSpeech}
+                            />
+                        )
+                    }
+                </td>
+            </tr>
+        );
+    };
+
     render() {
         const record = quip.apps.getRootRecord();
         const date = record.get("date");
@@ -239,89 +284,56 @@ class Root extends React.Component {
         const speakerSlots = record
             .get('speakerSlot')
             .getRecords()
-            .map((card, i) => {
-                // The speech number is 1 greater than the speech index.
-                const _number = i + 1;
-                // Make callback specific to this speech number.
-                const setSpeech = this.setSpeech.bind(this, _number);
-
-                return (
-                    <tr>
-                        <td>Speaker {_number}</td>
-                        <td>
-                            <quip.apps.ui.RichTextBox
-                                record={speakerObj[_number]}
-                            />
-                        <div className="speechTitle">
-                            <span>Title:</span>
-                            <quip.apps.ui.RichTextBox
-                                record={speechTitleObj[_number]}
-                            />
-                        </div>
-                        {
-                            card.get('details') ?
-                                <Speechslot
-                                    card={card}
-                                    removeValue={setSpeech}
-                                /> :
-                                <PickList
-                                    card={card}
-                                    setSpeech={setSpeech}
-                                />
-                        }
-                        </td>
-                    </tr>
-                );
-            });
+            .map(this.getSpeakerSlotRow.bind(this, speakerObj, speechTitleObj));
 
         return (
             <table className="root">
                 <tr>
                     <td>Meeting Date</td>
-                    <td><quip.apps.ui.RichTextBox record={date} /></td>
+                    <td><PlainRichTextBox record={date} /></td>
                 </tr>
                 <tr>
                     <td>Toastmaster</td>
-                    <td><quip.apps.ui.RichTextBox record={toastmaster} /></td>
+                    <td><PlainRichTextBox record={toastmaster} /></td>
                 </tr>
                 <tr>
                     <td>Grammarian</td>
-                    <td><quip.apps.ui.RichTextBox record={grammarian} /></td>
+                    <td><PlainRichTextBox record={grammarian} /></td>
                 </tr>
                 <tr>
                     <td>Timer</td>
-                    <td><quip.apps.ui.RichTextBox record={timer} /></td>
+                    <td><PlainRichTextBox record={timer} /></td>
                 </tr>
                 <tr>
                     <td>Ah Counter</td>
-                    <td><quip.apps.ui.RichTextBox record={ahCounter} /></td>
+                    <td><PlainRichTextBox record={ahCounter} /></td>
                 </tr>
                 <tr>
                     <td>Jokemaster</td>
-                    <td><quip.apps.ui.RichTextBox record={jokemaster} /></td>
+                    <td><PlainRichTextBox record={jokemaster} /></td>
                 </tr>
                 <tr>
                     <td>Topicsmaster</td>
-                    <td><quip.apps.ui.RichTextBox record={topicsmaster} /></td>
+                    <td><PlainRichTextBox record={topicsmaster} /></td>
                 </tr>
                 {speakerSlots}
                 <tr>
                     <td>General Evaluator</td>
-                    <td><quip.apps.ui.RichTextBox record={generalEvaluator} /></td>
+                    <td><PlainRichTextBox record={generalEvaluator} /></td>
                 </tr>
                 <tr>
                     <td>Evaluator 1</td>
-                    <td><quip.apps.ui.RichTextBox record={evaluator1} /></td>
+                    <td><PlainRichTextBox record={evaluator1} /></td>
                 </tr>
                 <tr>
                     <td>Evaluator 2</td>
-                    <td><quip.apps.ui.RichTextBox record={evaluator2} /></td>
+                    <td><PlainRichTextBox record={evaluator2} /></td>
                 </tr>
                 <tr>
                     <td colSpan="2">
                         <quip.apps.ui.Button
                             onClick={this.openTab}
-                            primary='BLUE'
+                            primary={true}
                             text='Save and Print'
                         />
                     </td>
@@ -336,8 +348,8 @@ quip.apps.initialize({
         const rootRecord = quip.apps.getRootRecord();
         const cardList = rootRecord.get("speakerSlot");
         if (params.isCreation) {
-            cardList.add({details: ''});
-            cardList.add({details: ''});
+            cardList.add({});
+            cardList.add({});
         }
         ReactDOM.render(<Root />, root);
     },

@@ -1657,7 +1657,7 @@ export default class PickList extends React.Component {
         this.state = {
             value: '',
             suggestions: [],
-        }
+        };
     }
 
     componentDidMount() {
@@ -1668,21 +1668,19 @@ export default class PickList extends React.Component {
         this.setState({value : nextProps.card.get('details')});
     }
 
-    setSpeech = (event) => {
+    setSpeech = event => {
         const _value = event.target.textContent.trim();
         this.props.setSpeech(_value);
         // hide suggestions
         this.setState({ suggestions: [] });
-    }
+    };
 
-    displayMatches = (event) => {
-        const _value = event.target.value;
-        const matchArray = findMatches(_value);
+    displayMatches = event => {
         this.setState({
-            suggestions: matchArray,
-            value: _value,
+            suggestions: findMatches(event.target.value),
+            value: event.target.value,
         });
-    }
+    };
 
     render() {
         const { card } = this.props;
