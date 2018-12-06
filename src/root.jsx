@@ -4,21 +4,6 @@ import { getTime } from './utils';
 import './root.css';
 
 const SPREADSHEET_ID = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
-const ROLES = new Set([
-    'toastmaster',
-    'date',
-    'toastmaster',
-    'jokemaster',
-    'topicsmaster',
-    'generalEvaluator',
-    'speaker1',
-    'speaker2',
-    'evaluator1',
-    'evaluator2',
-    'grammarian',
-    'timer',
-    'ahCounter',
-]);
 
 class SpeechSelect extends quip.apps.RichTextRecord {
     static getProperties = () => ({details: 'string'});
@@ -131,7 +116,8 @@ class Root extends React.Component {
 
     // JSON format: refer to agenda.json for details
     openTab = () => {
-        const orderedPayloadKeys = [
+        // Ordered list of keys expected when archiving agenda data.
+        const archiveDataKeys = [
             'date',
             'toastmaster',
             'grammarian',
@@ -150,26 +136,38 @@ class Root extends React.Component {
             'evaluator1',
             'evaluator2',
         ];
-        const record = quip.apps.getRootRecord();
-        const speakerSlot = record.get("speakerSlot").getRecords();
-        const payloadObject = {};
-        const _speakerSlot = speakerSlot.map((card, i) => {
-            // The speech number is 1 greater than the speech index.
-            const _number = i + 1;
-            const details = card.get('details');
-            const duration = getTime(card.get('details'));
-            payloadObject['project' + _number] = details;
-            payloadObject['duration' + _number] = duration;
+        const rootRecord = quip.apps.getRootRecord();
+        const speeches = rootRecord
+            .get('speakerSlot')
+            .getRecords()
+            .map((card, i) => {
+                const project = card.get('details');
+                const duration = getTime(card.get('details'));
+                const speaker = getNameFromRichTextContent(
+                    rootRecord.get(`speaker${i+1}`),
+                );
+                const title = getRichTextRecordContent(
+                    rootRecord.get(`speechTitle${i+1}`),
+                );
+                return {project, duration, speaker, title};
+            })
+            // Leave only speech objects with at least one non-blank value.
+            .filter(speech => Object.values(speech).every(x => x));
 
-            return {
-                project: details,
-                duration,
-            };
-        });
-
+        const archiveData = {
+            date: getRichTextRecordContent(rootRecord.get('date')),
+            ...Object.assign({},
+                ...speeches.map(({project, duration, speaker, title}, i) => ({
+                    [`project${i+1}`]: project,
+                    [`duration${i+1}`]: duration,
+                    [`speaker${i+1}`]: speaker,
+                    [`speechTitle${i+1}`]: title,
+                })),
+            ),
+        };
 
         // TODO: get version form manifest.json or another config file
-        const obj = {
+        const printAgendaData = {
             version: '1.0',
             data: {
                 officers: {
@@ -181,49 +179,33 @@ class Root extends React.Component {
                     soa: 'Jack Faraday',
                     treasurer: 'Ron Sison',
                 },
-                items: {speeches: _speakerSlot},
+                date: archiveData.date,
+                items: {speeches},
             },
         };
 
-        Object.keys(record.getData()).forEach((_key) => {
-            if (_key === 'speakerSlot') {
+        Object.entries(rootRecord.getData()).forEach(([key, record]) => {
+            if (
+                key === 'date' ||
+                key === 'speakerSlot' ||
+                key.startsWith('speaker') ||
+                key.startsWith('speechTitle')
+            ) {
                 return;
             }
-
-            const _keyRecord = record.get(_key);
-            // If this key corresponds to one of the roles, extract the name
-            // of the @-mentioned person from the raw rich text content.
-            const _value = ROLES.has(_key)
-                ? getNameFromRichTextContent(_keyRecord)
-                : _keyRecord.getTextContent().trim();
-            payloadObject[_key] = _value;
-
-            if (_key === 'date') {
-                obj.data.date = _value;
-            } else if (_key.startsWith('speaker')) {
-                // get the last character
-                const _index = parseInt(_key.slice(-1));
-                obj.data.items.speeches[_index - 1].speaker = _value;
-            } else if(_key.startsWith('speechTitle')) {
-                // get the last character
-                const _index = parseInt(_key.slice(-1));
-                obj.data.items.speeches[_index - 1].title = _value;
-            } else {
-                obj.data.items[_key] = _value;
-            }
+            // Assign remaining entries to both data targets.
+            archiveData[key] = printAgendaData.data.items[key] =
+                getNameFromRichTextContent(record);
         });
 
-        orderedPayloadKeys.forEach((str, index) => {
-            orderedPayloadKeys[index] = payloadObject[str];
-        });
-
-        // Save agenda data to Google Sheet.
-        this.postToPath(orderedPayloadKeys);
+        // Construct ordered array of archive agenda data ans POST to save to
+        // Google Sheet.
+        this.postToPath(archiveDataKeys.map(key => archiveData[key]));
 
         // Open print agenda page in new tab.
         quip.apps.openLink(
             'https://toastmasters-dev.github.io/print-agenda/?data=' +
-            encodeURIComponent(JSON.stringify(obj)),
+            encodeURIComponent(JSON.stringify(printAgendaData)),
         );
     }
 
@@ -359,10 +341,27 @@ function getNameFromRichTextContent(richTextRecord) {
     if (richTextRecord.empty()) {
         return '';
     }
-    const value = richTextRecord.getTextContent().trim()
+    const value = getRichTextRecordContent(richTextRecord);
     const match = value.match(/\[(.+?)\]\(https:\/\/[^\/]+\/\w+\)/);
     if (match) {
         return match[1];
     }
     return value;
+}
+
+/**
+ * Return the content of the record, or empty string if the record is empty.
+ * Also, trim the returned string of any extra spaces.
+ *
+ * If a `RichTextRecord` with placeholder text is empty, `getTextContent()`
+ * returns the placeholder string instead of an empty one. This is problematic,
+ * because it is indistinguishable from actual user input.
+ */
+function getRichTextRecordContent(richTextRecord) {
+    if (!richTextRecord instanceof quip.apps.RichTextRecord) {
+        throw new Error('Non-RichTextRecord encountered.');
+    }
+    return richTextRecord.empty()
+        ? ''
+        : richTextRecord.getTextContent().trim();
 }
