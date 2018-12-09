@@ -1,0 +1,41 @@
+language: node_js
+
+# Use stable version of Node.js
+node_js:
+  - node
+
+# Cache installed node_modules between builds
+cache:
+  directories:
+    - node_modules
+
+# Do not build tags (otherwise newly tagged releases get rebuilt)
+if: tag IS blank
+
+env:
+  - VERSION_NUMBER=$(node build/get-app-version-number.js)
+
+install:
+  - yarn global add create-quip-app
+  - yarn install
+
+script:
+  - yarn run build
+
+before_deploy:
+  - export TRAVIS_TAG="v${VERSION_NUMBER}-b${TRAVIS_BUILD_NUMBER}"
+  - git tag -f "$TRAVIS_TAG"
+
+# Deploy by publishing the built app.ele file as a GitHub release
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file: app/app.ele
+  # Generate fancy release name
+  name: "Version ${VERSION_NUMBER}: $(TZ=UTC date +'%B %d, %Y %r')"
+  # Necessary for GitHub release deploy mechanism
+  skip-cleanup: true
+  # Skip deploys from tags and branches other than the master
+  on:
+    branch: master
+    tags: false
