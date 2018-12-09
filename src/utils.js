@@ -1,30 +1,17 @@
 /**
- * @param {String} _projectString Can be of form 
- * "5) The Crisis Management Speech (4-6 min; 3-5 min Q&amp;A)"
- * @returns {Integer} Number of minutes 
+ * @param {String} projectString The speech project. For example, it could be:
+ *     "5) The Crisis Management Speech (4-6 min; 3-5 min Q&A)"
+ * @returns {number} Number of minutes, or undefined if none found in input
  */
-function getTime(_projectString) {
-    const arr = _projectString.toLowerCase().split(' ');
+export function getTime(projectString) {
+    const results = projectString.match(/(\d+-)?\d+(?= min)/g);
 
-    // find all indexes which end with min or min)
-    const minuteIndexes = [];
-    arr.forEach((seg, index) => {
-        if (seg === 'min' || seg === 'min;' || seg === 'min)') {
-            minuteIndexes.push(index);
-        }
-    });
+    if (!results) {
+        return undefined;
+    }
 
-    let totalMinutes = 0;
-    minuteIndexes.forEach((_index) => {
-        let slot = arr[_index - 1]; // ie. '(5-7'
-        let minutes = parseInt(slot.slice(slot.indexOf('-') + 1, slot.length));    
-        totalMinutes += minutes;
-    });
-
-    return totalMinutes + ' minutes';
+    return results
+        .map(x => parseInt(x.match(/\d+$/)[0]))
+        .reduce((a, b) => a + b)
+        + ' minutes';
 }
-
-module.exports = {
-    getTime,
-};
-
