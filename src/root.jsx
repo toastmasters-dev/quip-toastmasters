@@ -152,7 +152,7 @@ class Root extends React.Component {
                 return {project, duration, speaker, title};
             })
             // Leave only speech objects with at least one non-blank value.
-            .filter(speech => Object.values(speech).every(x => x));
+            .filter(speech => Object.values(speech).some(x => x));
 
         const archiveData = {
             date: getRichTextRecordContent(rootRecord.get('date')),
