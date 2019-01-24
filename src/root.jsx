@@ -26,6 +26,8 @@ class RootRecord extends quip.apps.RootRecord {
         speechTitle1: quip.apps.RichTextRecord,
         speaker2: quip.apps.RichTextRecord,
         speechTitle2: quip.apps.RichTextRecord,
+        speaker3: quip.apps.RichTextRecord,
+        speechTitle3: quip.apps.RichTextRecord,
         evaluator1: quip.apps.RichTextRecord,
         evaluator2: quip.apps.RichTextRecord,
         grammarian: quip.apps.RichTextRecord,
@@ -46,6 +48,8 @@ class RootRecord extends quip.apps.RootRecord {
         speechTitle1: { RichText_placeholderText: "Add a speech title" },
         speaker2: { RichText_placeholderText: NAME_PROMPT },
         speechTitle2: { RichText_placeholderText: "Add a speech title" },
+        speaker3: { RichText_placeholderText: NAME_PROMPT },
+        speechTitle3: { RichText_placeholderText: "Add a speech title" },
         evaluator1: { RichText_placeholderText: NAME_PROMPT },
         evaluator2: { RichText_placeholderText: NAME_PROMPT },
         grammarian: { RichText_placeholderText: NAME_PROMPT },
@@ -132,6 +136,10 @@ class Root extends React.Component {
             'project2',
             'speaker2',
             'duration2',
+            'speechTitle3',
+            'project3',
+            'speaker3',
+            'duration3',
             'generalEvaluator',
             'evaluator1',
             'evaluator2',
@@ -209,7 +217,7 @@ class Root extends React.Component {
         );
     }
 
-    getSpeakerSlotRow(speakerObj, speechTitleObj, card, i) {
+    getSpeakerSlotRow(speakerObj, speechTitleObj, card, i, speakerTitleObj) {
         // The speech number is 1 greater than the speech index.
         const number = i + 1;
         // Make callback specific to this speech number.
@@ -217,7 +225,7 @@ class Root extends React.Component {
 
         return (
             <tr key={i}>
-                <td>Speaker {number}</td>
+                <td>{speakerTitleObj[number - 1]}</td>
                 <td>
                     <PlainRichTextBox record={speakerObj[number]} />
                     <div className="speechTitle">
@@ -252,10 +260,12 @@ class Root extends React.Component {
         const speakerObj = {
             1: record.get('speaker1'),
             2: record.get('speaker2'),
+            3: record.get('speaker3'),
         };
         const speechTitleObj = {
             1: record.get('speechTitle1'),
             2: record.get('speechTitle2'),
+            3: record.get('speechTitle3'),
         };
         const evaluator1 = record.get('evaluator1');
         const evaluator2 = record.get('evaluator2');
@@ -263,10 +273,17 @@ class Root extends React.Component {
         const timer = record.get('timer');
         const ahCounter = record.get('ahCounter');
 
+        const speakerTitles = {
+            1: 'Speaker 1',
+            2: 'Speaker 2',
+            3: 'Backup Speaker',
+        };
+
         const speakerSlots = record
             .get('speakerSlot')
             .getRecords()
-            .map(this.getSpeakerSlotRow.bind(this, speakerObj, speechTitleObj));
+            .map(this.getSpeakerSlotRow.bind(this, speakerObj, speechTitleObj,
+                                             speakerTitles));
 
         return (
             <table className="root">
