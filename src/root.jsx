@@ -217,7 +217,7 @@ class Root extends React.Component {
         );
     }
 
-    getSpeakerSlotRow(speakerObj, speechTitleObj, card, i, speakerTitleObj) {
+    getSpeakerSlotRow(speakerObj, speakerTitleObj, speechTitleObj, card, i) {
         // The speech number is 1 greater than the speech index.
         const number = i + 1;
         // Make callback specific to this speech number.
@@ -282,8 +282,8 @@ class Root extends React.Component {
         const speakerSlots = record
             .get('speakerSlot')
             .getRecords()
-            .map(this.getSpeakerSlotRow.bind(this, speakerObj, speechTitleObj,
-                                             speakerTitles));
+            .map(this.getSpeakerSlotRow.bind(this, speakerObj, speakerTitles,
+                                             speechTitleObj));
 
         return (
             <table className="root">
