@@ -15,12 +15,17 @@ if: tag IS blank
 env:
   - VERSION_NUMBER=$(node build/get-app-version-number.js)
 
+before_install:
+  - sudo apt update
+  # Python 2.7 is needed for create-quip-app to build and package Quip app.
+  - sudo apt install -y python2.7
+
 install:
-  - yarn global add create-quip-app
-  - yarn install
+  - npm install -g create-quip-app
+  - npm install
 
 script:
-  - yarn run build
+  - npm run build
 
 before_deploy:
   - export TRAVIS_TAG="v${VERSION_NUMBER}-b${TRAVIS_BUILD_NUMBER}"
