@@ -5,6 +5,28 @@ import './root.css';
 
 const SPREADSHEET_ID = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
 
+// Names of speaker roes
+const SPEAKER_NAMES = [
+    'Speaker 1',
+    'Speaker 2',
+    'Backup Speaker',
+];
+
+// Names of speaker records.
+const SPEAKER_RECORDS = [
+    'speaker1',
+    'speaker2',
+    'backupSpeaker',
+];
+
+// Names of speech title records.
+const SPEECH_TITLE_RECORDS = [
+    'speechTitle1',
+    'speechTitle2',
+    'backupSpeechTitle',
+];
+
+
 class SpeechSelect extends quip.apps.RichTextRecord {
     static getProperties = () => ({details: 'string'});
 
@@ -26,8 +48,8 @@ class RootRecord extends quip.apps.RootRecord {
         speechTitle1: quip.apps.RichTextRecord,
         speaker2: quip.apps.RichTextRecord,
         speechTitle2: quip.apps.RichTextRecord,
-        speaker3: quip.apps.RichTextRecord,
-        speechTitle3: quip.apps.RichTextRecord,
+        backupSpeaker: quip.apps.RichTextRecord,
+        backupSpeechTitle: quip.apps.RichTextRecord,
         evaluator1: quip.apps.RichTextRecord,
         evaluator2: quip.apps.RichTextRecord,
         grammarian: quip.apps.RichTextRecord,
@@ -48,14 +70,15 @@ class RootRecord extends quip.apps.RootRecord {
         speechTitle1: { RichText_placeholderText: "Add a speech title" },
         speaker2: { RichText_placeholderText: NAME_PROMPT },
         speechTitle2: { RichText_placeholderText: "Add a speech title" },
-        speaker3: { RichText_placeholderText: NAME_PROMPT },
-        speechTitle3: { RichText_placeholderText: "Add a speech title" },
+        backupSpeaker: { RichText_placeholderText: NAME_PROMPT },
+        backupSpeechTitle: { RichText_placeholderText: "Add a speech title" },
         evaluator1: { RichText_placeholderText: NAME_PROMPT },
         evaluator2: { RichText_placeholderText: NAME_PROMPT },
         grammarian: { RichText_placeholderText: NAME_PROMPT },
         timer: { RichText_placeholderText: NAME_PROMPT },
         ahCounter: { RichText_placeholderText: NAME_PROMPT },
-        speakerSlot: [],
+        // Initialize three speaker slots.
+        speakerSlot: [{}, {}, {}],
     })
 }
 
@@ -107,11 +130,10 @@ class Root extends React.Component {
         });
     }
 
-    setSpeech(speechInt, value) {
+    setSpeech(speechIndex, value) {
         quip.apps.getRootRecord()
             .get('speakerSlot')
-            // Get speech record by index - 1 less than the speech number.
-            .get(speechInt - 1)
+            .get(speechIndex)
             .set('details', value);
 
         // Force a render without state change to show speech details.
@@ -136,9 +158,9 @@ class Root extends React.Component {
             'project2',
             'speaker2',
             'duration2',
-            'speechTitle3',
+            'backupSpeechTitle',
             'project3',
-            'speaker3',
+            'backupSpeaker',
             'duration3',
             'generalEvaluator',
             'evaluator1',
@@ -148,14 +170,16 @@ class Root extends React.Component {
         const speeches = rootRecord
             .get('speakerSlot')
             .getRecords()
+            // Exclude backup speaker from printed agenda by slicing array.
+            .slice(0, 2)
             .map((card, i) => {
                 const project = card.get('details');
                 const duration = getTime(card.get('details'));
                 const speaker = getNameFromRichTextContent(
-                    rootRecord.get(`speaker${i+1}`),
+                    rootRecord.get(SPEAKER_RECORDS[i]),
                 );
                 const title = getRichTextRecordContent(
-                    rootRecord.get(`speechTitle${i+1}`),
+                    rootRecord.get(SPEECH_TITLE_RECORDS[i]),
                 );
                 return {project, duration, speaker, title};
             })
@@ -217,20 +241,18 @@ class Root extends React.Component {
         );
     }
 
-    getSpeakerSlotRow(speakerObj, speakerTitleObj, speechTitleObj, card, i) {
-        // The speech number is 1 greater than the speech index.
-        const number = i + 1;
+    getSpeakerSlotRow(speakers, speechTitles, card, i) {
         // Make callback specific to this speech number.
-        const setSpeech = this.setSpeech.bind(this, number);
+        const setSpeech = this.setSpeech.bind(this, i);
 
         return (
             <tr key={i}>
-                <td>{speakerTitleObj[number - 1]}</td>
+                <td>{SPEAKER_NAMES[i]}</td>
                 <td>
-                    <PlainRichTextBox record={speakerObj[number]} />
+                    <PlainRichTextBox record={speakers[i]} />
                     <div className="speechTitle">
                         <span>Title:</span>
-                        <PlainRichTextBox record={speechTitleObj[number]} />
+                        <PlainRichTextBox record={speechTitles[i]} />
                     </div>
                     {
                         card.get('details') ? (
@@ -257,33 +279,21 @@ class Root extends React.Component {
         const jokemaster = record.get("jokemaster");
         const topicsmaster = record.get('topicsmaster');
         const generalEvaluator = record.get('generalEvaluator');
-        const speakerObj = {
-            1: record.get('speaker1'),
-            2: record.get('speaker2'),
-            3: record.get('speaker3'),
-        };
-        const speechTitleObj = {
-            1: record.get('speechTitle1'),
-            2: record.get('speechTitle2'),
-            3: record.get('speechTitle3'),
-        };
         const evaluator1 = record.get('evaluator1');
         const evaluator2 = record.get('evaluator2');
         const grammarian = record.get('grammarian');
         const timer = record.get('timer');
         const ahCounter = record.get('ahCounter');
 
-        const speakerTitles = {
-            1: 'Speaker 1',
-            2: 'Speaker 2',
-            3: 'Backup Speaker',
-        };
+        // Get speaker record data.
+        const speakers = SPEAKER_RECORDS.map(name => record.get(name));
+        // Get speech title record data.
+        const speechTitles = SPEECH_TITLE_RECORDS.map(name => record.get(name));
 
         const speakerSlots = record
             .get('speakerSlot')
             .getRecords()
-            .map(this.getSpeakerSlotRow.bind(this, speakerObj, speakerTitles,
-                                             speechTitleObj));
+            .map(this.getSpeakerSlotRow.bind(this, speakers, speechTitles));
 
         return (
             <table className="root">
@@ -344,12 +354,6 @@ class Root extends React.Component {
 
 quip.apps.initialize({
     initializationCallback: (root, params) => {
-        const rootRecord = quip.apps.getRootRecord();
-        const cardList = rootRecord.get("speakerSlot");
-        if (params.isCreation) {
-            cardList.add({});
-            cardList.add({});
-        }
         ReactDOM.render(<Root />, root);
     },
 });
