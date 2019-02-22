@@ -1,13 +1,13 @@
 {
-    "name": "sticky-note",
+    "name": "quip-app-toastmasters-agenda",
     "version": "0.0.1",
-    "description": "Sticky Note Quip App",
+    "description": "Toastmasters Agenda Quip Live App",
     "license": "Apache-2.0",
     "scripts": {
         "start": "NODE_ENV=development webpack-dev-server --https",
         "build": "NODE_ENV=production webpack; create-quip-app pack ./app"
     },
-    "author": "",
+    "author": "Salesforce Toastmasters",
     "devDependencies": {
         "quip-apps-webpack-config": ">=0.0.6"
     }

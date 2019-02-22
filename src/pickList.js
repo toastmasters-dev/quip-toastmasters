@@ -1,8 +1,6 @@
 import speeches from './speeches.json';
 import './pickList.css';
 
-// import fs from 'fs'; // not working with webpack
-
 // Build index of speech objects for normalized searching.
 const index = speeches.map(({manual, project}, i) => ({
     haystack: normalize(manual + ' ' + project),
