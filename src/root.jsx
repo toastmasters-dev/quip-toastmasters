@@ -376,8 +376,20 @@ quip.apps.initialize({
             rootRecord.setDataVersion(RootRecord.DATA_VERSION);
         }
 
-        const newDataVersion =
+        let newDataVersion =
             rootRecord.getDataVersion() === RootRecord.DATA_VERSION;
+
+        if (!newDataVersion) {
+            migrateData();
+            rootRecord.setDataVersion(RootRecord.DATA_VERSION);
+            newDataVersion = true;
+            console.log(
+                `Successfully migrated Toastmasters Agenda with root ` +
+                `record ID ${rootRecord.getUniqueId()} and meeting date ` +
+                `${getRichTextRecordContent(rootRecord.get('date'))} to new ` +
+                `data version.`,
+            );
+        }
 
         ReactDOM.render(
             // Based on detected data version, render new or old React
@@ -387,3 +399,63 @@ quip.apps.initialize({
         );
     },
 });
+
+function migrateData() {
+    const rootRecord = quip.apps.getRootRecord();
+
+    rootRecord.set('roles', {
+        // Explicitly set to empty array to prevent record initialization
+        // logic from creating default entries.
+        roleRecordIds: [],
+    });
+
+    const roles = rootRecord.get('roles');
+    const roleRecordIds = roles.get('roleRecordIds');
+    const plainRoles = roles.get('plainRoles');
+    const speechRoles = roles.get('speechRoles');
+
+    [
+        ['toastmaster', 'Toastmaster'],
+        ['ahCounter', 'Ah Counter'],
+        ['grammarian', 'Grammarian'],
+        ['timer', 'Timer'],
+        ['jokemaster', 'Jokemaster'],
+    ].forEach(migratePlainRoleRecord);
+
+    const speeches = rootRecord
+        .get('speakerSlot')
+        .getRecords()
+        .forEach((oldRecord, i) => {
+            const newRecord = speechRoles.add({
+                roleName: SPEAKER_NAMES[i],
+                speechProject: oldRecord.get('details'),
+            });
+            newRecord.clear('person');
+            newRecord.clear('speechTitle');
+            const person = rootRecord.clear(SPEAKER_RECORDS[i], true);
+            newRecord.set('person', person);
+            const speechTitle =
+                rootRecord.clear(SPEECH_TITLE_RECORDS[i], true);
+            newRecord.set('speechTitle', speechTitle);
+            roleRecordIds.add({roleRecordId: newRecord.getId()});
+        });
+
+    rootRecord.clear('speakerSlot');
+    rootRecord.clear('backupSpeaker');
+    rootRecord.clear('backupSpeechTitle');
+
+    [
+        ['topicsmaster', 'Topicsmaster'],
+        ['generalEvaluator', 'General Evaluator'],
+        ['evaluator1', 'Evaluator 1'],
+        ['evaluator2', 'Evaluator 2'],
+    ].forEach(migratePlainRoleRecord);
+
+    function migratePlainRoleRecord([oldRecordName, roleName]) {
+        const newRecord = plainRoles.add({roleName});
+        newRecord.clear('person');
+        const person = rootRecord.clear(oldRecordName, true);
+        newRecord.set('person', person);
+        roleRecordIds.add({roleRecordId: newRecord.getId()});
+    }
+}
