@@ -8,7 +8,6 @@ var test3 = "4) The Press Conference (3-5 min; 2-3 min for Q&amp;A)"
 expect: 8
 */
 
-import {getTime} from './utils';
 import './speechSlot.css';
 
 export default ({card, removeValue}) => (
