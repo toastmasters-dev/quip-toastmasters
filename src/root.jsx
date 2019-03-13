@@ -6,7 +6,7 @@ import {
     getRichTextRecordContent,
 } from 'utils/utils';
 import './root.css';
-import {RolesRecord} from 'model/records';
+import {DateRecord, RolesRecord} from 'model/records';
 import Roles from 'components/roles';
 
 const SPREADSHEET_ID = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
@@ -45,7 +45,7 @@ const NAME_PROMPT = 'Add a name using @Person';
 
 class RootRecord extends quip.apps.RootRecord {
     static getProperties = () => ({
-        date: quip.apps.RichTextRecord,
+        date: DateRecord,
         roles: RolesRecord,
 
         // Old data model.
@@ -68,9 +68,7 @@ class RootRecord extends quip.apps.RootRecord {
     });
 
     static getDefaultProperties = () => ({
-        date: {
-            RichText_placeholderText: "When is the meeting? Start with @Date",
-        },
+        date: {},
         roles: {},
 
         // Old data model.
@@ -392,6 +390,19 @@ quip.apps.initialize({
                 `data version.`,
             );
         }
+
+        /*
+         * Date migration logic. Uncomment after app supports both versions
+         * of date record.
+         *
+         * if (!(rootRecord.get('date') instanceof DateRecord)) {
+         *     // Migrate date record to commentable version.
+         *     const dateValue = rootRecord.clear('date', true);
+         *     const dateRecord = rootRecord.get('date');
+         *     dateRecord.clear('value');
+         *     dateRecord.set('value', dateValue);
+         * }
+         */
 
         ReactDOM.render(
             // Based on detected data version, render new or old React

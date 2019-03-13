@@ -1,5 +1,35 @@
 const NAME_PLACEHOLDER = 'Add a name using @Person';
 
+class CommentableRecord extends quip.apps.Record {
+    node = null;
+
+    getDom() {
+        return this.node;
+    }
+
+    setDom(node) {
+        this.node = node;
+    }
+
+    supportsComments() {
+        return true;
+    }
+}
+
+export class DateRecord extends CommentableRecord {
+    static getProperties = () => ({
+        value: quip.apps.RichTextRecord,
+    });
+
+    static getDefaultProperties = () => ({
+        value: {
+            RichText_placeholderText: 'When is the meeting? Start with @Date',
+        },
+    });
+}
+
+quip.apps.registerClass(DateRecord, 'date-record');
+
 export class RolesRecord extends quip.apps.Record {
     static getProperties = () => ({
         // List of record IDs, each of which points to a record in one of the
@@ -75,12 +105,12 @@ export class RolePointerRecord extends quip.apps.Record {
 quip.apps.registerClass(RolePointerRecord, 'role-pointer-record');
 
 /**
- * Common base class for different types of role records.
+ * Abstract base class for different types of role records.
  *
- * Since it is used only as a marker and never directly instantiated, this
- * class is not registered with `quip.apps.registerClass`.
+ * Because this class will not be instantiated directly, it is not registered
+ * with `quip.apps.registerClass`.
  */
-export class RoleRecord extends quip.apps.Record {}
+export class RoleRecord extends CommentableRecord {}
 
 export class PlainRoleRecord extends RoleRecord {
     static getProperties = () => ({

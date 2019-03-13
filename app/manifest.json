@@ -2,7 +2,7 @@
     "id": "UDHAjApfBDr",
     "manifest_version": 4,
     "name": "Toastmasters Agenda",
-    "disable_app_level_comments": true,
+    "disable_app_level_comments": false,
     "version_name": "2.0",
     "version_number": 14,
     "sizing_mode": "fill_container",
