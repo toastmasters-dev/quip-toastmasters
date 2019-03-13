@@ -1,0 +1,10 @@
+/* Give all cells padding and make text stick to top */
+.roles td {
+    padding: 0.5rem 0.5rem 0 0;
+    vertical-align: top;
+}
+
+/* For all table rows but the last, make the first cell bold */
+.roles tr:not(:last-child) td:first-child {
+    font-weight: bold;
+}

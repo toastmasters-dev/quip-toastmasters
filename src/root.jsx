@@ -1,7 +1,13 @@
 import PickList from "./pickList";
 import Speechslot from "./speechSlot";
-import { getTime } from './utils';
+import {
+    getTime,
+    getNameFromRichTextRecord,
+    getRichTextRecordContent,
+} from 'utils/utils';
 import './root.css';
+import {RolesRecord} from 'model/records';
+import Roles from 'components/roles';
 
 const SPREADSHEET_ID = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
 
@@ -40,6 +46,9 @@ const NAME_PROMPT = 'Add a name using @Person';
 class RootRecord extends quip.apps.RootRecord {
     static getProperties = () => ({
         date: quip.apps.RichTextRecord,
+        roles: RolesRecord,
+
+        // Old data model.
         toastmaster: quip.apps.RichTextRecord,
         jokemaster: quip.apps.RichTextRecord,
         topicsmaster: quip.apps.RichTextRecord,
@@ -56,12 +65,15 @@ class RootRecord extends quip.apps.RootRecord {
         timer: quip.apps.RichTextRecord,
         ahCounter: quip.apps.RichTextRecord,
         speakerSlot: quip.apps.RecordList.Type(SpeechSelect),
-    })
+    });
 
     static getDefaultProperties = () => ({
         date: {
             RichText_placeholderText: "When is the meeting? Start with @Date",
         },
+        roles: {},
+
+        // Old data model.
         toastmaster: { RichText_placeholderText: NAME_PROMPT },
         jokemaster: { RichText_placeholderText: NAME_PROMPT },
         topicsmaster: { RichText_placeholderText: NAME_PROMPT },
@@ -79,7 +91,9 @@ class RootRecord extends quip.apps.RootRecord {
         ahCounter: { RichText_placeholderText: NAME_PROMPT },
         // Initialize three speaker slots.
         speakerSlot: [{}, {}, {}],
-    })
+    });
+
+    static DATA_VERSION = 1;
 }
 
 quip.apps.registerClass(RootRecord, 'root');
@@ -175,7 +189,7 @@ class Root extends React.Component {
             .map((card, i) => {
                 const project = card.get('details');
                 const duration = getTime(card.get('details'));
-                const speaker = getNameFromRichTextContent(
+                const speaker = getNameFromRichTextRecord(
                     rootRecord.get(SPEAKER_RECORDS[i]),
                 );
                 const title = getRichTextRecordContent(
@@ -198,7 +212,6 @@ class Root extends React.Component {
             ),
         };
 
-        // TODO: get version form manifest.json or another config file
         const printAgendaData = {
             version: '1.0',
             data: {
@@ -227,7 +240,7 @@ class Root extends React.Component {
             }
             // Assign remaining entries to both data targets.
             archiveData[key] = printAgendaData.data.items[key] =
-                getNameFromRichTextContent(record);
+                getNameFromRichTextRecord(record);
         });
 
         // Construct ordered array of archive agenda data ans POST to save to
@@ -354,35 +367,23 @@ class Root extends React.Component {
 
 quip.apps.initialize({
     initializationCallback: (root, params) => {
-        ReactDOM.render(<Root />, root);
+        const rootRecord = quip.apps.getRootRecord();
+
+        if (params.isCreation) {
+            // RootRecord does not initialize its data version property upon
+            // creation, so set it manually. See
+            // https://salesforce.stackexchange.com/q/248755.
+            rootRecord.setDataVersion(RootRecord.DATA_VERSION);
+        }
+
+        const newDataVersion =
+            rootRecord.getDataVersion() === RootRecord.DATA_VERSION;
+
+        ReactDOM.render(
+            // Based on detected data version, render new or old React
+            // component.
+            newDataVersion ? <Roles /> : <Root />,
+            root,
+        );
     },
 });
-
-function getNameFromRichTextContent(richTextRecord) {
-    if (richTextRecord.empty()) {
-        return '';
-    }
-    const value = getRichTextRecordContent(richTextRecord);
-    const match = value.match(/\[(.+?)\]\(https:\/\/[^\/]+\/\w+\)/);
-    if (match) {
-        return match[1];
-    }
-    return value;
-}
-
-/**
- * Return the content of the record, or empty string if the record is empty.
- * Also, trim the returned string of any extra spaces.
- *
- * If a `RichTextRecord` with placeholder text is empty, `getTextContent()`
- * returns the placeholder string instead of an empty one. This is problematic,
- * because it is indistinguishable from actual user input.
- */
-function getRichTextRecordContent(richTextRecord) {
-    if (!richTextRecord instanceof quip.apps.RichTextRecord) {
-        throw new Error('Non-RichTextRecord encountered.');
-    }
-    return richTextRecord.empty()
-        ? ''
-        : richTextRecord.getTextContent().trim();
-}
