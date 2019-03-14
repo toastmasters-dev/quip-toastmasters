@@ -12,26 +12,15 @@ export class RolesRecord extends quip.apps.Record {
     });
 
     static getDefaultProperties = () => ({
-        // Specifically initialize to null when this record is created. See
-        // `initialize` function below to see why this is needed.
-        roleRecordIds: null,
-
+        roleRecordIds: [],
         plainRoles: [],
         speechRoles: [],
     });
 
-    static DATA_VERSION = 1;
-
-    initialize(...args) {
-        super.initialize(...args);
-
-        if (this.get('roleRecordIds')) {
-            // Only proceed to create records if not done previously.
-            return;
-        }
-
-        this.set('roleRecordIds', []);
-
+    /**
+     * Called during app creation to initialize with default agenda data.
+     */
+    seed() {
         const roleRecordIds = this.get('roleRecordIds');
         const plainRoles = this.get('plainRoles');
         const speechRoles = this.get('speechRoles');

@@ -370,6 +370,8 @@ quip.apps.initialize({
         const rootRecord = quip.apps.getRootRecord();
 
         if (params.isCreation) {
+            // Initialize default set of roles for new agenda instance.
+            rootRecord.get('roles').seed();
             // RootRecord does not initialize its data version property upon
             // creation, so set it manually. See
             // https://salesforce.stackexchange.com/q/248755.
@@ -402,13 +404,6 @@ quip.apps.initialize({
 
 function migrateData() {
     const rootRecord = quip.apps.getRootRecord();
-
-    rootRecord.set('roles', {
-        // Explicitly set to empty array to prevent record initialization
-        // logic from creating default entries.
-        roleRecordIds: [],
-    });
-
     const roles = rootRecord.get('roles');
     const roleRecordIds = roles.get('roleRecordIds');
     const plainRoles = roles.get('plainRoles');
