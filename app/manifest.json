@@ -4,7 +4,7 @@
     "name": "Toastmasters Agenda",
     "disable_app_level_comments": false,
     "version_name": "2.0",
-    "version_number": 14,
+    "version_number": 15,
     "sizing_mode": "fill_container",
     "initial_height": 300,
     "initial_width": 300,
