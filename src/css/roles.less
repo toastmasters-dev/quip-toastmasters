@@ -1,10 +1,46 @@
-/* Give all cells padding and make text stick to top */
+/*
+ * Give all cells padding and make text stick to top.
+ */
 .roles td {
-    padding: 0.5rem 0.5rem 0 0;
+    padding: 0.25rem;
     vertical-align: top;
 }
 
-/* For all table rows but the last, make the first cell bold */
+.roles td:first-child {
+    padding-left: 0;
+}
+
+.roles td:last-child {
+    padding-right: 0;
+}
+
+/*
+ * Omit rule `.roles tr:first-child td { padding-top: 0; }` to give first table
+ * row (i.e. meeting date) enough space between its text and the top edge of
+ * the comment section highlight.
+ */
+
+.roles tr:last-child td {
+    padding-bottom: 0;
+}
+
+/*
+ * With the exception of the last table row, make the first cell bold.
+ */
 .roles tr:not(:last-child) td:first-child {
     font-weight: bold;
+}
+
+/*
+ * Align comments bubble with role text.
+ */
+.commentsBubble {
+    margin-top: 3px;
+}
+
+/*
+ * Only show comment-less bubble if the row is being hovered.
+ */
+.roles tr:not(:hover) .emptyCommentsBubble {
+    visibility: hidden;
 }
