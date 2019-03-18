@@ -1,4 +1,5 @@
 import {RoleRecord, PlainRoleRecord, SpeechRoleRecord} from 'model/records';
+import CommentsBubble from './comments-bubble';
 import PlainRichTextBox from './plain-rich-text-box';
 import SpeechProject from './speech-project';
 import SpeechProjectSelector from './speech-project-selector';
@@ -12,26 +13,28 @@ export default class Role extends React.Component {
     };
 
     componentDidMount() {
-        this.props.roleRecord.listen(this.onRecordChange);
+        // Re-render component when there is a change on the underlying record.
+        this.props.roleRecord.listen(this.triggerForceUpdate);
     }
 
     componentWillUnmount() {
-        this.props.roleRecord.unlisten(this.onRecordChange);
+        this.props.roleRecord.unlisten(this.triggerForceUpdate);
     }
-
-    /**
-     * Re-render component when there is a change in the record.
-     *
-     * Most importantly, this tracks changes in the `speechProject` property.
-     */
-    onRecordChange = () => this.forceUpdate();
 
     render() {
         const roleName = this.props.roleRecord.get('roleName');
 
         return (
-            <tr key={roleName}>
-                <td>{roleName}</td>
+            <tr
+                key={roleName}
+                ref={node => this.props.roleRecord.setDom(node)}
+            >
+                <td>
+                    <span className={styles.roleName}>{roleName}</span>
+                </td>
+                <td>
+                    <CommentsBubble record={this.props.roleRecord} />
+                </td>
                 {this.renderContent()}
             </tr>
         );
@@ -54,8 +57,10 @@ export default class Role extends React.Component {
                 <td>
                     <PlainRichTextBox record={person} />
                     <div className={styles.speechTitle}>
-                    <span>Title:</span>
-                    <PlainRichTextBox record={roleRecord.get('speechTitle')} />
+                        <span>Title:</span>
+                        <PlainRichTextBox
+                            record={roleRecord.get('speechTitle')}
+                        />
                     </div>
                     {this.renderSpeechProject(roleRecord)}
                 </td>
@@ -79,4 +84,6 @@ export default class Role extends React.Component {
                 : <SpeechProjectSelector speechRoleRecord={roleRecord} />
         );
     }
+
+    triggerForceUpdate = () => this.forceUpdate();
 }

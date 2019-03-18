@@ -3,8 +3,21 @@
     margin: 0.25rem 0;
 }
 
-/* Make rich text box take up remaining space, and give it some margin */
+/*
+ * Align static text with `RichTextBox` text baseline.
+ */
+.speechTitle > :first-child {
+    line-height: 21px;
+}
+
+/*
+ * Make rich text box take up remaining space, and give it some margin.
+ */
 .speechTitle > :last-child {
     flex-grow: 1;
     margin-left: 0.25rem;
+}
+
+.roleName {
+    vertical-align: top;
 }
