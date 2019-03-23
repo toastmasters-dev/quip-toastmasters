@@ -1,5 +1,3 @@
-import styles from 'css/plain-rich-text-box.less';
-
 /**
  * Wrapper component for `RichTextBox` which restricts editing styles.
  *
@@ -7,7 +5,6 @@ import styles from 'css/plain-rich-text-box.less';
  */
 const PlainRichTextBox = props => (
     <quip.apps.ui.RichTextBox
-        className={styles.plainRichTextBox}
         {...props}
         allowedStyles={[quip.apps.RichTextRecord.Style.TEXT_PLAIN]}
         allowedInlineStyles={[]}
