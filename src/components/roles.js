@@ -15,7 +15,10 @@ export default function Roles() {
                 <td>Meeting Date</td>
                 <td>{commentsBubble}</td>
                 <td>
-                    <PlainRichTextBox record={dateValue} />
+                    <PlainRichTextBox
+                        record={dateValue}
+                        interceptClicks={false}
+                    />
                 </td>
             </tr>
             {
