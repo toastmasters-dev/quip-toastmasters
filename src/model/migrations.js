@@ -3,6 +3,7 @@ import {getRichTextRecordContent} from 'utils/utils';
 
 const MIGRATION_FUNCTIONS = [
     migrateFromVersion0,
+    migrateFromVersion1,
 ];
 
 /**
@@ -126,6 +127,16 @@ function migrateFromVersion0() {
         newRecord.set('person', person);
         roleRecordIds.add({roleRecordId: newRecord.getId()});
     }
+}
+
+/*
+ * Migrate date record to commentable version.
+ */
+function migrateFromVersion1() {
+    const rootRecord = quip.apps.getRootRecord();
+    const dateValue = rootRecord.clear('date', true);
+    const newDateRecord = rootRecord.get('date');
+    newDateRecord.set('value', dateValue);
 }
 
 function getAppLogText() {

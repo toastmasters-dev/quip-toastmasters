@@ -7,16 +7,17 @@ import styles from 'css/roles.less';
 export default function Roles() {
     const rootRecord = quip.apps.getRootRecord();
     const date = rootRecord.get('date');
-    const {ref, dateValue, commentsBubble} = getDateData(date);
 
     return (
         <table className={styles.roles}>
-            <tr ref={ref}>
+            <tr ref={node => date.setDom(node)}>
                 <td>Meeting Date</td>
-                <td>{commentsBubble}</td>
+                <td>
+                    <CommentsBubble record={date} />
+                </td>
                 <td>
                     <PlainRichTextBox
-                        record={dateValue}
+                        record={date.get('value')}
                         interceptClicks={false}
                     />
                 </td>
@@ -42,17 +43,3 @@ export default function Roles() {
         </table>
     );
 }
-
-// TODO(#26): Drop conditional logic after data migration to `DateRecord` is
-//     complete.
-const getDateData = dateRecord => dateRecord.setDom
-    ? {
-        ref: node => dateRecord.setDom(node),
-        dateValue: dateRecord.get('value'),
-        commentsBubble: <CommentsBubble record={dateRecord} />,
-    }
-    : {
-        ref: () => {},
-        dateValue: dateRecord,
-        commentsBubble: null,
-    };

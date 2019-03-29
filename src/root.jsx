@@ -13,7 +13,7 @@ class RootRecord extends quip.apps.RootRecord {
         roles: {},
     });
 
-    static DATA_VERSION = 1;
+    static DATA_VERSION = 2;
 }
 
 quip.apps.registerClass(RootRecord, 'root');
@@ -33,19 +33,6 @@ quip.apps.initialize({
         } else {
             runMigrations();
         }
-
-        /*
-         * Date migration logic. Uncomment after app supports both versions
-         * of date record.
-         *
-         * if (!(rootRecord.get('date') instanceof DateRecord)) {
-         *     // Migrate date record to commentable version.
-         *     const dateValue = rootRecord.clear('date', true);
-         *     const dateRecord = rootRecord.get('date');
-         *     dateRecord.clear('value');
-         *     dateRecord.set('value', dateValue);
-         * }
-         */
 
         ReactDOM.render(<Roles />, root);
     },
