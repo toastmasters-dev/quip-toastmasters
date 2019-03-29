@@ -7,6 +7,7 @@ import {
 } from 'utils/utils';
 import './root.css';
 import {DateRecord, RolesRecord} from 'model/records';
+import runMigrations from 'model/migrations';
 import Roles from 'components/roles';
 
 const SPREADSHEET_ID = '1tsv0pJv6i6W8IG809Kod12x58e_7s_IfF785u4UUdpg';
@@ -374,21 +375,9 @@ quip.apps.initialize({
             // creation, so set it manually. See
             // https://salesforce.stackexchange.com/q/248755.
             rootRecord.setDataVersion(RootRecord.DATA_VERSION);
-        }
 
-        let newDataVersion =
-            rootRecord.getDataVersion() === RootRecord.DATA_VERSION;
-
-        if (!newDataVersion) {
-            migrateData();
-            rootRecord.setDataVersion(RootRecord.DATA_VERSION);
-            newDataVersion = true;
-            console.log(
-                `Successfully migrated Toastmasters Agenda with root ` +
-                `record ID ${rootRecord.getUniqueId()} and meeting date ` +
-                `${getRichTextRecordContent(rootRecord.get('date'))} to new ` +
-                `data version.`,
-            );
+        } else {
+            runMigrations();
         }
 
         /*
@@ -404,64 +393,6 @@ quip.apps.initialize({
          * }
          */
 
-        ReactDOM.render(
-            // Based on detected data version, render new or old React
-            // component.
-            newDataVersion ? <Roles /> : <Root />,
-            root,
-        );
+        ReactDOM.render(<Roles />, root);
     },
 });
-
-function migrateData() {
-    const rootRecord = quip.apps.getRootRecord();
-    const roles = rootRecord.get('roles');
-    const roleRecordIds = roles.get('roleRecordIds');
-    const plainRoles = roles.get('plainRoles');
-    const speechRoles = roles.get('speechRoles');
-
-    [
-        ['toastmaster', 'Toastmaster'],
-        ['ahCounter', 'Ah Counter'],
-        ['grammarian', 'Grammarian'],
-        ['timer', 'Timer'],
-        ['jokemaster', 'Jokemaster'],
-    ].forEach(migratePlainRoleRecord);
-
-    const speeches = rootRecord
-        .get('speakerSlot')
-        .getRecords()
-        .forEach((oldRecord, i) => {
-            const newRecord = speechRoles.add({
-                roleName: SPEAKER_NAMES[i],
-                speechProject: oldRecord.get('details'),
-            });
-            newRecord.clear('person');
-            newRecord.clear('speechTitle');
-            const person = rootRecord.clear(SPEAKER_RECORDS[i], true);
-            newRecord.set('person', person);
-            const speechTitle =
-                rootRecord.clear(SPEECH_TITLE_RECORDS[i], true);
-            newRecord.set('speechTitle', speechTitle);
-            roleRecordIds.add({roleRecordId: newRecord.getId()});
-        });
-
-    rootRecord.clear('speakerSlot');
-    rootRecord.clear('backupSpeaker');
-    rootRecord.clear('backupSpeechTitle');
-
-    [
-        ['topicsmaster', 'Topicsmaster'],
-        ['generalEvaluator', 'General Evaluator'],
-        ['evaluator1', 'Evaluator 1'],
-        ['evaluator2', 'Evaluator 2'],
-    ].forEach(migratePlainRoleRecord);
-
-    function migratePlainRoleRecord([oldRecordName, roleName]) {
-        const newRecord = plainRoles.add({roleName});
-        newRecord.clear('person');
-        const person = rootRecord.clear(oldRecordName, true);
-        newRecord.set('person', person);
-        roleRecordIds.add({roleRecordId: newRecord.getId()});
-    }
-}
