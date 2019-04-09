@@ -86,7 +86,8 @@ function getPrintAgendaData() {
     return {
         version: '1.0',
         data: {
-            date: getRichTextRecordContent(rootRecord.get('date')),
+            date:
+                getRichTextRecordContent(rootRecord.get('date').get('value')),
             // TODO (#12): Use site preferences to store officer names instead
             //     of hard-coding.
             officers: {
