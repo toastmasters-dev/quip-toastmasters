@@ -88,17 +88,7 @@ function getPrintAgendaData() {
         data: {
             date:
                 getRichTextRecordContent(rootRecord.get('date').get('value')),
-            // TODO (#12): Use site preferences to store officer names instead
-            //     of hard-coding.
-            officers: {
-                president: 'KC Lakshminarasimham',
-                vpm: 'Anny He',
-                vpe: 'Srinath Krishna Ananthakrishnan',
-                vppr: 'Max Kukartsev',
-                secretary: 'Rosaura Arevalo',
-                soa: 'Jack Faraday',
-                treasurer: 'Ron Sison',
-            },
+            officers: quip.apps.getSitePreferences().getForKey('officers'),
             items,
         },
     };
