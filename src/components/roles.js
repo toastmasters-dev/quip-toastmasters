@@ -27,12 +27,24 @@ export default function Roles() {
                     .get('roles')
                     .get('roleRecordIds')
                     .getRecords()
-                    .map(rolePointer =>
-                        <Role roleRecord={rolePointer.getRoleRecord()} />
-                    )
+                    .map((rolePointer, i) => {
+                        const roleRecord = rolePointer.getRoleRecord();
+                        return (
+                            roleRecord
+                            ? <Role roleRecord={rolePointer.getRoleRecord()} />
+                            : (
+                                <tr key={`error-${i}`}>
+                                    <td colSpan="3">
+                                        Error loading record with recordId{' '}
+                                        = {rolePointer.get('roleRecordId')}.
+                                    </td>
+                                </tr>
+                            )
+                        );
+                    })
             }
             <tr>
-                <td colSpan="2">
+                <td colSpan="3">
                     <quip.apps.ui.Button
                         onClick={printAndSave}
                         primary={true}
