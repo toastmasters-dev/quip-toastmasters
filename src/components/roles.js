@@ -28,15 +28,23 @@ export default function Roles() {
                     .get('roleRecordIds')
                     .getRecords()
                     .map((rolePointer, i) => {
-                        const roleRecord = rolePointer.getRoleRecord();
+                        let roleRecord;
+                        let roleRecordId;
+
+                        try {
+                            roleRecordId = rolePointer.get('roleRecordId') ||
+                                '<unknown>';
+                            roleRecord = rolePointer.getRoleRecord();
+                        } catch(e) { }
+
                         return (
                             roleRecord
-                            ? <Role roleRecord={rolePointer.getRoleRecord()} />
+                            ? <Role roleRecord={roleRecord} />
                             : (
                                 <tr key={`error-${i}`}>
                                     <td colSpan="3">
-                                        Error loading record with recordId{' '}
-                                        = {rolePointer.get('roleRecordId')}.
+                                        Error loading record with{' '}
+                                        <tt>recordId = {roleRecordId}</tt>.
                                     </td>
                                 </tr>
                             )
